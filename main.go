@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
+	"gopkg.in/urfave/cli.v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -50,5 +52,21 @@ func list() {
 }
 
 func main() {
-	list()
+	app := cli.NewApp()
+	app.Commands = []cli.Command{
+		{
+			Name:    "list",
+			Aliases: []string{"ls"},
+			Usage:   "List all secrets in a namespace",
+			Action: func(c *cli.Context) error {
+				list()
+				return nil
+			},
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
