@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -115,6 +116,30 @@ func getSecretKeys(ctx *cli.Context) error {
 }
 
 func setSecretKeys(ctx *cli.Context) error {
+	if len(ctx.Args()) != 2 {
+		return fmt.Errorf("Incorrect number of arguments")
+	}
+
+	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	data := ctx.Args().Get(1)
+
+	for _, item := range strings.Split(data, ",") {
+		split := strings.SplitN(item, "=", 2)
+		if len(split) != 2 {
+			return fmt.Errorf("Data is not formatted correctly: %s", item)
+		}
+		secret.Data[split[0]] = []byte(split[1])
+	}
+
+	_, err = secretInterface.Update(secret)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
