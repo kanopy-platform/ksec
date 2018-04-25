@@ -125,6 +125,10 @@ func setSecretKeys(ctx *cli.Context) error {
 		return err
 	}
 
+	if secret.Data == nil {
+		secret.Data = make(map[string][]byte)
+	}
+
 	data := ctx.Args().Get(1)
 
 	for _, item := range strings.Split(data, ",") {
