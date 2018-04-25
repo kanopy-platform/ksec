@@ -159,7 +159,7 @@ func output_tabular(lines []string) {
 
 func main() {
 	app := cli.NewApp()
-	app.Usage = "A tool managing Kubernetes Secret data"
+	app.Usage = "A tool for managing Kubernetes Secret data"
 	app.Version = "0.1.0"
 	app.Commands = []cli.Command{
 		{
