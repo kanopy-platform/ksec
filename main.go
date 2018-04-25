@@ -46,22 +46,23 @@ func init() {
 	secretInterface = client.CoreV1().Secrets(namespace)
 }
 
-func listSecrets() {
+func listSecrets() error {
 	secrets, err := secretInterface.List(metav1.ListOptions{})
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
-	lines := []string{"Name\tNamespace", "----\t---------"}
+	lines := []string{"NAME\tNAMESPACE"}
 	for _, secret := range secrets.Items {
 		lines = append(lines, fmt.Sprintf("%s\t%s", secret.Name, namespace))
 	}
 	output_tabular(lines)
+	return nil
 }
 
-func createSecret(ctx *cli.Context) {
+func createSecret(ctx *cli.Context) error {
 	if len(ctx.Args()) != 1 {
-		log.Fatal("ERROR: Incorrect number of arguments")
+		return fmt.Errorf("Incorrect number of arguments")
 	}
 
 	name := ctx.Args().Get(0)
@@ -77,11 +78,12 @@ func createSecret(ctx *cli.Context) {
 		log.Fatal(err.Error())
 	}
 	fmt.Printf("Created %s\n", name)
+	return nil
 }
 
-func deleteSecret(ctx *cli.Context) {
+func deleteSecret(ctx *cli.Context) error {
 	if len(ctx.Args()) < 1 {
-		log.Fatal("No arguments specified")
+		return fmt.Errorf("No arguments specified")
 	}
 
 	for _, secret := range ctx.Args() {
@@ -90,14 +92,30 @@ func deleteSecret(ctx *cli.Context) {
 		}
 		fmt.Printf("Deleted %s\n", secret)
 	}
+	return nil
 }
 
-func getSecretKeys(ctx *cli.Context) {
-	return
+func getSecretKeys(ctx *cli.Context) error {
+	if len(ctx.Args()) != 1 {
+		return fmt.Errorf("Incorrect number of arguments")
+	}
+
+	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	lines := []string{"KEY\tVALUE"}
+	for key, value := range secret.Data {
+		lines = append(lines, fmt.Sprintf("%s\t%s", key, value))
+	}
+	output_tabular(lines)
+
+	return nil
 }
 
-func setSecretKeys(ctx *cli.Context) {
-	return
+func setSecretKeys(ctx *cli.Context) error {
+	return nil
 }
 
 func output_tabular(lines []string) {
@@ -126,32 +144,28 @@ func main() {
 			Name:  "create",
 			Usage: "Create a Kubernetes Secret",
 			Action: func(ctx *cli.Context) error {
-				createSecret(ctx)
-				return nil
+				return createSecret(ctx)
 			},
 		},
 		{
 			Name:  "delete",
 			Usage: "Delete a Kubernetes Secret",
 			Action: func(ctx *cli.Context) error {
-				deleteSecret(ctx)
-				return nil
+				return deleteSecret(ctx)
 			},
 		},
 		{
 			Name:  "get",
 			Usage: "Get values from a Kubernetes Secret",
 			Action: func(ctx *cli.Context) error {
-				getSecretKeys(ctx)
-				return nil
+				return getSecretKeys(ctx)
 			},
 		},
 		{
 			Name:  "set",
 			Usage: "Set values in a Kubernetes Secret",
 			Action: func(ctx *cli.Context) error {
-				setSecretKeys(ctx)
-				return nil
+				return setSecretKeys(ctx)
 			},
 		},
 	}
