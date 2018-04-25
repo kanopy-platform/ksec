@@ -55,12 +55,12 @@ func listSecrets() {
 	}
 }
 
-func createSecret(c *cli.Context) {
-	if len(c.Args()) != 1 {
+func createSecret(ctx *cli.Context) {
+	if len(ctx.Args()) != 1 {
 		log.Fatal("ERROR: Incorrect number of arguments")
 	}
 
-	name := c.Args().Get(0)
+	name := ctx.Args().Get(0)
 
 	secret := v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -75,17 +75,25 @@ func createSecret(c *cli.Context) {
 	fmt.Printf("Created %s\n", name)
 }
 
-func deleteSecret(c *cli.Context) {
-	if len(c.Args()) < 1 {
+func deleteSecret(ctx *cli.Context) {
+	if len(ctx.Args()) < 1 {
 		log.Fatal("No arguments specified")
 	}
 
-	for _, secret := range c.Args() {
+	for _, secret := range ctx.Args() {
 		if err := secretInterface.Delete(secret, &metav1.DeleteOptions{}); err != nil {
 			log.Fatal(err.Error())
 		}
 		fmt.Printf("Deleted %s\n", secret)
 	}
+}
+
+func getSecretKeys(ctx *cli.Context) {
+	return
+}
+
+func setSecretKeys(ctx *cli.Context) {
+	return
 }
 
 func main() {
@@ -96,7 +104,7 @@ func main() {
 			Name:    "list",
 			Aliases: []string{"ls"},
 			Usage:   "List all secrets in a namespace",
-			Action: func(c *cli.Context) error {
+			Action: func(ctx *cli.Context) error {
 				listSecrets()
 				return nil
 			},
@@ -104,16 +112,32 @@ func main() {
 		{
 			Name:  "create",
 			Usage: "Create a Kubernetes Secret",
-			Action: func(c *cli.Context) error {
-				createSecret(c)
+			Action: func(ctx *cli.Context) error {
+				createSecret(ctx)
 				return nil
 			},
 		},
 		{
 			Name:  "delete",
 			Usage: "Delete a Kubernetes Secret",
-			Action: func(c *cli.Context) error {
-				deleteSecret(c)
+			Action: func(ctx *cli.Context) error {
+				deleteSecret(ctx)
+				return nil
+			},
+		},
+		{
+			Name:  "get",
+			Usage: "Get values from a Kubernetes Secret",
+			Action: func(ctx *cli.Context) error {
+				getSecretKeys(ctx)
+				return nil
+			},
+		},
+		{
+			Name:  "set",
+			Usage: "Set values in a Kubernetes Secret",
+			Action: func(ctx *cli.Context) error {
+				setSecretKeys(ctx)
 				return nil
 			},
 		},
