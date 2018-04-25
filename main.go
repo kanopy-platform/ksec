@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"text/tabwriter"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -26,7 +27,8 @@ func init() {
 	configOverrides := &clientcmd.ConfigOverrides{}
 	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
 
-	namespace, _, err := kubeConfig.Namespace()
+	var err error
+	namespace, _, err = kubeConfig.Namespace()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -50,9 +52,11 @@ func listSecrets() {
 		log.Fatal(err.Error())
 	}
 
+	lines := []string{"Name\tNamespace", "----\t---------"}
 	for _, secret := range secrets.Items {
-		fmt.Printf("%s\n", secret.Name)
+		lines = append(lines, fmt.Sprintf("%s\t%s", secret.Name, namespace))
 	}
+	output_tabular(lines)
 }
 
 func createSecret(ctx *cli.Context) {
@@ -94,6 +98,14 @@ func getSecretKeys(ctx *cli.Context) {
 
 func setSecretKeys(ctx *cli.Context) {
 	return
+}
+
+func output_tabular(lines []string) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	for _, line := range lines {
+		fmt.Fprintln(w, line)
+	}
+	w.Flush()
 }
 
 func main() {
