@@ -98,6 +98,7 @@ func setSecretKeys(ctx *cli.Context) {
 
 func main() {
 	app := cli.NewApp()
+	app.Usage = "A tool managing Kubernetes Secret data"
 	app.Version = "0.1.0"
 	app.Commands = []cli.Command{
 		{
