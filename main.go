@@ -74,10 +74,11 @@ func createSecret(ctx *cli.Context) error {
 			Namespace: namespace,
 		},
 	}
-	_, err := secretInterface.Create(&secret)
-	if err != nil {
-		log.Fatal(err.Error())
+
+	if _, err := secretInterface.Create(&secret); err != nil {
+		return err
 	}
+
 	fmt.Printf("Created %s\n", name)
 	return nil
 }
@@ -89,8 +90,9 @@ func deleteSecret(ctx *cli.Context) error {
 
 	for _, secret := range ctx.Args() {
 		if err := secretInterface.Delete(secret, &metav1.DeleteOptions{}); err != nil {
-			log.Fatal(err.Error())
+			return err
 		}
+
 		fmt.Printf("Deleted %s\n", secret)
 	}
 	return nil
@@ -165,8 +167,7 @@ func main() {
 			Aliases: []string{"ls"},
 			Usage:   "List all secrets in a namespace",
 			Action: func(ctx *cli.Context) error {
-				listSecrets()
-				return nil
+				return listSecrets()
 			},
 		},
 		{
