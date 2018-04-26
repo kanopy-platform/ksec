@@ -79,7 +79,7 @@ func createSecret(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Printf("Created %s\n", name)
+	fmt.Printf("Created secret \"%s\"\n", name)
 	return nil
 }
 
@@ -93,7 +93,7 @@ func deleteSecret(ctx *cli.Context) error {
 			return err
 		}
 
-		fmt.Printf("Deleted %s\n", secret)
+		fmt.Printf("Deleted secret \"%s\"\n", secret)
 	}
 	return nil
 }
@@ -149,12 +149,41 @@ func setSecretKeys(ctx *cli.Context) error {
 	return nil
 }
 
+func unsetSecretKeys(ctx *cli.Context) error {
+	if len(ctx.Args()) != 2 {
+		return fmt.Errorf("Incorrect number of arguments")
+	}
+
+	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	keys := ctx.Args().Get(1)
+
+	for _, key := range strings.Split(keys, ",") {
+		delete(secret.Data, key)
+		fmt.Printf("Removed \"%s\" from secret \"%s\"\n", key, secret.Name)
+	}
+
+	_, err = secretInterface.Update(secret)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func output_tabular(lines []string) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
 	w.Flush()
+}
+
+func loadKeys(ctx *cli.Context) error {
+	return nil
 }
 
 func main() {
@@ -196,6 +225,20 @@ func main() {
 			Usage: "Set values in a Kubernetes Secret",
 			Action: func(ctx *cli.Context) error {
 				return setSecretKeys(ctx)
+			},
+		},
+		{
+			Name:  "unset",
+			Usage: "Unset values in a Kubernetes Secret",
+			Action: func(ctx *cli.Context) error {
+				return unsetSecretKeys(ctx)
+			},
+		},
+		{
+			Name:  "load",
+			Usage: "Load values from a env file into a Kubernetes Secret",
+			Action: func(ctx *cli.Context) error {
+				return loadKeys(ctx)
 			},
 		},
 	}
