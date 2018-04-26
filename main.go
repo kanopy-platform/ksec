@@ -204,6 +204,13 @@ func main() {
 			},
 		},
 		{
+			Name:  "create",
+			Usage: "Create a k8s Secret",
+			Action: func(ctx *cli.Context) error {
+				return createSecret(ctx)
+			},
+		},
+		{
 			Name:  "get",
 			Usage: "Get values from a k8s Secret",
 			Action: func(ctx *cli.Context) error {
