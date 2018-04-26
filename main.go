@@ -182,13 +182,17 @@ func output_tabular(lines []string) {
 	w.Flush()
 }
 
-func loadKeys(ctx *cli.Context) error {
+func pushKeys(ctx *cli.Context) error {
+	return nil
+}
+
+func pullKeys(ctx *cli.Context) error {
 	return nil
 }
 
 func main() {
 	app := cli.NewApp()
-	app.Usage = "A tool for managing Kubernetes Secret data"
+	app.Usage = "A tool for managing k8s Secret data"
 	app.Version = "0.1.0"
 	app.Commands = []cli.Command{
 		{
@@ -200,45 +204,45 @@ func main() {
 			},
 		},
 		{
-			Name:  "create",
-			Usage: "Create a Kubernetes Secret",
-			Action: func(ctx *cli.Context) error {
-				return createSecret(ctx)
-			},
-		},
-		{
-			Name:  "delete",
-			Usage: "Delete a Kubernetes Secret",
-			Action: func(ctx *cli.Context) error {
-				return deleteSecret(ctx)
-			},
-		},
-		{
 			Name:  "get",
-			Usage: "Get values from a Kubernetes Secret",
+			Usage: "Get values from a k8s Secret",
 			Action: func(ctx *cli.Context) error {
 				return getSecretKeys(ctx)
 			},
 		},
 		{
 			Name:  "set",
-			Usage: "Set values in a Kubernetes Secret",
+			Usage: "Set values in a k8s Secret",
 			Action: func(ctx *cli.Context) error {
 				return setSecretKeys(ctx)
 			},
 		},
 		{
 			Name:  "unset",
-			Usage: "Unset values in a Kubernetes Secret",
+			Usage: "Unset values in a k8s Secret",
 			Action: func(ctx *cli.Context) error {
 				return unsetSecretKeys(ctx)
 			},
 		},
 		{
-			Name:  "load",
-			Usage: "Load values from a env file into a Kubernetes Secret",
+			Name:  "push",
+			Usage: "Push values from a .env file into a k8s Secret",
 			Action: func(ctx *cli.Context) error {
-				return loadKeys(ctx)
+				return pushKeys(ctx)
+			},
+		},
+		{
+			Name:  "pull",
+			Usage: "Pull values from a k8s Secret into a .env file",
+			Action: func(ctx *cli.Context) error {
+				return pullKeys(ctx)
+			},
+		},
+		{
+			Name:  "delete",
+			Usage: "Delete a k8s Secret",
+			Action: func(ctx *cli.Context) error {
+				return deleteSecret(ctx)
 			},
 		},
 	}
