@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -174,20 +175,83 @@ func unsetSecretKeys(ctx *cli.Context) error {
 	return nil
 }
 
+func pushKeys(ctx *cli.Context) error {
+	if len(ctx.Args()) != 2 {
+		return fmt.Errorf("Incorrect number of arguments")
+	}
+
+	secret, err := secretInterface.Get(ctx.Args().Get(1), metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	if secret.Data == nil {
+		secret.Data = make(map[string][]byte)
+	}
+
+	file, err := os.Open(ctx.Args().Get(0))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		text := scanner.Text()
+		split := strings.Split(text, "=")
+
+		if len(split) != 2 {
+			return fmt.Errorf("Incorrectly formatted environment variable: %s", text)
+		}
+
+		secret.Data[split[0]] = []byte(split[1])
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	_, err = secretInterface.Update(secret)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func pullKeys(ctx *cli.Context) error {
+	if len(ctx.Args()) != 2 {
+		return fmt.Errorf("Incorrect number of arguments")
+	}
+
+	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(ctx.Args().Get(1))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	for key, value := range secret.Data {
+		_, err = file.WriteString(fmt.Sprintf("%s=%s\n", key, value))
+		if err != nil {
+			return err
+		}
+	}
+
+	file.Sync()
+
+	return nil
+}
+
 func output_tabular(lines []string) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
 	w.Flush()
-}
-
-func pushKeys(ctx *cli.Context) error {
-	return nil
-}
-
-func pullKeys(ctx *cli.Context) error {
-	return nil
 }
 
 func main() {
