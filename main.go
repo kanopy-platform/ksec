@@ -211,6 +211,13 @@ func main() {
 			},
 		},
 		{
+			Name:  "delete",
+			Usage: "Delete a Secret",
+			Action: func(ctx *cli.Context) error {
+				return deleteSecrets(ctx)
+			},
+		},
+		{
 			Name:  "get",
 			Usage: "Get values from a Secret",
 			Action: func(ctx *cli.Context) error {
@@ -243,13 +250,6 @@ func main() {
 			Usage: "Pull values from a Secret into a .env file",
 			Action: func(ctx *cli.Context) error {
 				return pullKeys(ctx)
-			},
-		},
-		{
-			Name:  "delete",
-			Usage: "Delete a Secret",
-			Action: func(ctx *cli.Context) error {
-				return deleteSecrets(ctx)
 			},
 		},
 	}
