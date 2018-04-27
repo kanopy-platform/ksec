@@ -83,7 +83,7 @@ func createSecret(ctx *cli.Context) error {
 	return nil
 }
 
-func deleteSecret(ctx *cli.Context) error {
+func deleteSecrets(ctx *cli.Context) error {
 	if len(ctx.Args()) < 1 {
 		return fmt.Errorf("No arguments specified")
 	}
@@ -192,7 +192,7 @@ func pullKeys(ctx *cli.Context) error {
 
 func main() {
 	app := cli.NewApp()
-	app.Usage = "A tool for managing k8s Secret data"
+	app.Usage = "A tool for managing Kubernetes Secret data"
 	app.Version = "0.1.0"
 	app.Commands = []cli.Command{
 		{
@@ -205,51 +205,51 @@ func main() {
 		},
 		{
 			Name:  "create",
-			Usage: "Create a k8s Secret",
+			Usage: "Create a Secret",
 			Action: func(ctx *cli.Context) error {
 				return createSecret(ctx)
 			},
 		},
 		{
 			Name:  "get",
-			Usage: "Get values from a k8s Secret",
+			Usage: "Get values from a Secret",
 			Action: func(ctx *cli.Context) error {
 				return getSecretKeys(ctx)
 			},
 		},
 		{
 			Name:  "set",
-			Usage: "Set values in a k8s Secret",
+			Usage: "Set values in a Secret",
 			Action: func(ctx *cli.Context) error {
 				return setSecretKeys(ctx)
 			},
 		},
 		{
 			Name:  "unset",
-			Usage: "Unset values in a k8s Secret",
+			Usage: "Unset values in a Secret",
 			Action: func(ctx *cli.Context) error {
 				return unsetSecretKeys(ctx)
 			},
 		},
 		{
 			Name:  "push",
-			Usage: "Push values from a .env file into a k8s Secret",
+			Usage: "Push values from a .env file into a Secret",
 			Action: func(ctx *cli.Context) error {
 				return pushKeys(ctx)
 			},
 		},
 		{
 			Name:  "pull",
-			Usage: "Pull values from a k8s Secret into a .env file",
+			Usage: "Pull values from a Secret into a .env file",
 			Action: func(ctx *cli.Context) error {
 				return pullKeys(ctx)
 			},
 		},
 		{
 			Name:  "delete",
-			Usage: "Delete a k8s Secret",
+			Usage: "Delete a Secret",
 			Action: func(ctx *cli.Context) error {
-				return deleteSecret(ctx)
+				return deleteSecrets(ctx)
 			},
 		},
 	}
