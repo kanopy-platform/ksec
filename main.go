@@ -32,6 +32,12 @@ var (
 	username        string
 )
 
+func check(err error) {
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+}
+
 func init() {
 	var err error
 
@@ -41,25 +47,17 @@ func init() {
 	)
 
 	namespace, _, err = kubeConfig.Namespace()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	check(err)
 
 	rawConfig, err := kubeConfig.RawConfig()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	check(err)
 	username = rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo
 
 	config, err := kubeConfig.ClientConfig()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	check(err)
 
 	client, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	check(err)
 
 	secretInterface = client.CoreV1().Secrets(namespace)
 }
@@ -361,7 +359,5 @@ func main() {
 	}
 
 	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 }
