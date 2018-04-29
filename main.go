@@ -58,8 +58,7 @@ func createSecret(ctx *cli.Context) error {
 
 	secret := v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: cfg.Namespace,
+			Name: name,
 		},
 	}
 
