@@ -29,7 +29,6 @@ type keyAnnotation struct {
 type Config struct {
 	KubeConfig      clientcmd.ClientConfig
 	SecretInterface apiv1.SecretInterface
-	Namespace       string
 	User            string
 }
 
@@ -41,11 +40,10 @@ func listSecrets(ctx *cli.Context) error {
 		return err
 	}
 
-	lines := []string{"NAME\tNAMESPACE"}
+	fmt.Println("NAME")
 	for _, secret := range secrets.Items {
-		lines = append(lines, fmt.Sprintf("%s\t%s", secret.Name, cfg.Namespace))
+		fmt.Println(secret.Name)
 	}
-	output_tabular(lines)
 	return nil
 }
 
@@ -343,6 +341,8 @@ func main() {
 			&clientcmd.ConfigOverrides{},
 		)
 
+		// set SecretInterface global
+		var namespace string
 		config, err := cfg.KubeConfig.ClientConfig()
 		if err != nil {
 			return err
@@ -351,20 +351,15 @@ func main() {
 		if err != nil {
 			return err
 		}
-
-		// set Namespace global
 		if ctx.String("namespace") != "" {
-			cfg.Namespace = ctx.String("namespace")
+			namespace = ctx.String("namespace")
 		} else {
-			ns, _, err := cfg.KubeConfig.Namespace()
+			namespace, _, err = cfg.KubeConfig.Namespace()
 			if err != nil {
 				return err
 			}
-			cfg.Namespace = ns
 		}
-
-		// set SecretInterface global
-		cfg.SecretInterface = client.CoreV1().Secrets(cfg.Namespace)
+		cfg.SecretInterface = client.CoreV1().Secrets(namespace)
 
 		// set User global
 		rawConfig, err := cfg.KubeConfig.RawConfig()
