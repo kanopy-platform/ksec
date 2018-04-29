@@ -26,51 +26,24 @@ type keyAnnotation struct {
 	LastUpdated string `json:"lastUpdated"`
 }
 
-var (
-	secretInterface apiv1.SecretInterface
-	namespace       string
-	username        string
-)
-
-func check(err error) {
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+type Config struct {
+	KubeConfig      clientcmd.ClientConfig
+	SecretInterface apiv1.SecretInterface
+	Namespace       string
+	User            string
 }
 
-func init() {
-	var err error
+var cfg Config
 
-	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{},
-	)
-
-	namespace, _, err = kubeConfig.Namespace()
-	check(err)
-
-	rawConfig, err := kubeConfig.RawConfig()
-	check(err)
-	username = rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo
-
-	config, err := kubeConfig.ClientConfig()
-	check(err)
-
-	client, err := kubernetes.NewForConfig(config)
-	check(err)
-
-	secretInterface = client.CoreV1().Secrets(namespace)
-}
-
-func listSecrets() error {
-	secrets, err := secretInterface.List(metav1.ListOptions{})
+func listSecrets(ctx *cli.Context) error {
+	secrets, err := cfg.SecretInterface.List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 
 	lines := []string{"NAME\tNAMESPACE"}
 	for _, secret := range secrets.Items {
-		lines = append(lines, fmt.Sprintf("%s\t%s", secret.Name, namespace))
+		lines = append(lines, fmt.Sprintf("%s\t%s", secret.Name, cfg.Namespace))
 	}
 	output_tabular(lines)
 	return nil
@@ -86,11 +59,11 @@ func createSecret(ctx *cli.Context) error {
 	secret := v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: namespace,
+			Namespace: cfg.Namespace,
 		},
 	}
 
-	if _, err := secretInterface.Create(&secret); err != nil {
+	if _, err := cfg.SecretInterface.Create(&secret); err != nil {
 		return err
 	}
 
@@ -104,7 +77,7 @@ func deleteSecrets(ctx *cli.Context) error {
 	}
 
 	for _, secret := range ctx.Args() {
-		if err := secretInterface.Delete(secret, &metav1.DeleteOptions{}); err != nil {
+		if err := cfg.SecretInterface.Delete(secret, &metav1.DeleteOptions{}); err != nil {
 			return err
 		}
 
@@ -118,7 +91,7 @@ func getSecretKeys(ctx *cli.Context) error {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
-	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	secret, err := cfg.SecretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -150,13 +123,13 @@ func setSecretKeys(ctx *cli.Context) error {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
-	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	secret, err := cfg.SecretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
 
 	annotation := keyAnnotation{
-		UpdatedBy:   username,
+		UpdatedBy:   cfg.User,
 		LastUpdated: time.Now().Format(time.RFC3339),
 	}
 
@@ -182,7 +155,7 @@ func setSecretKeys(ctx *cli.Context) error {
 		secret.ObjectMeta.Annotations[fmt.Sprintf("ksec.io/%s", split[0])] = string(jsonAnnotations)
 	}
 
-	_, err = secretInterface.Update(secret)
+	_, err = cfg.SecretInterface.Update(secret)
 	if err != nil {
 		return err
 	}
@@ -195,7 +168,7 @@ func unsetSecretKeys(ctx *cli.Context) error {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
-	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	secret, err := cfg.SecretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -207,7 +180,7 @@ func unsetSecretKeys(ctx *cli.Context) error {
 		fmt.Printf("Removed \"%s\" from secret \"%s\"\n", key, secret.Name)
 	}
 
-	_, err = secretInterface.Update(secret)
+	_, err = cfg.SecretInterface.Update(secret)
 	if err != nil {
 		return err
 	}
@@ -220,7 +193,7 @@ func pushKeys(ctx *cli.Context) error {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
-	secret, err := secretInterface.Get(ctx.Args().Get(1), metav1.GetOptions{})
+	secret, err := cfg.SecretInterface.Get(ctx.Args().Get(1), metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -250,7 +223,7 @@ func pushKeys(ctx *cli.Context) error {
 		return err
 	}
 
-	_, err = secretInterface.Update(secret)
+	_, err = cfg.SecretInterface.Update(secret)
 	if err != nil {
 		return err
 	}
@@ -263,7 +236,7 @@ func pullKeys(ctx *cli.Context) error {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
-	secret, err := secretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
+	secret, err := cfg.SecretInterface.Get(ctx.Args().Get(0), metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -298,13 +271,19 @@ func main() {
 	app := cli.NewApp()
 	app.Usage = "A tool for managing Kubernetes Secret data"
 	app.Version = "0.1.0"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "namespace, n",
+			Usage: "Operate in a specific `NAMESPACE` (Defaults to the current kubeconfig namespace)",
+		},
+	}
 	app.Commands = []cli.Command{
 		{
 			Name:    "list",
 			Aliases: []string{"ls"},
 			Usage:   "List all secrets in a namespace",
 			Action: func(ctx *cli.Context) error {
-				return listSecrets()
+				return listSecrets(ctx)
 			},
 		},
 		{
@@ -358,6 +337,47 @@ func main() {
 		},
 	}
 
+	app.Before = func(ctx *cli.Context) error {
+		// set KubeConfig global
+		cfg.KubeConfig = clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+			clientcmd.NewDefaultClientConfigLoadingRules(),
+			&clientcmd.ConfigOverrides{},
+		)
+
+		config, err := cfg.KubeConfig.ClientConfig()
+		if err != nil {
+			return err
+		}
+		client, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			return err
+		}
+
+		// set Namespace global
+		if ctx.String("namespace") != "" {
+			cfg.Namespace = ctx.String("namespace")
+		} else {
+			ns, _, err := cfg.KubeConfig.Namespace()
+			if err != nil {
+				return err
+			}
+			cfg.Namespace = ns
+		}
+
+		// set SecretInterface global
+		cfg.SecretInterface = client.CoreV1().Secrets(cfg.Namespace)
+
+		// set User global
+		rawConfig, err := cfg.KubeConfig.RawConfig()
+		if err != nil {
+			return err
+		}
+		cfg.User = rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo
+		return nil
+	}
+
 	err := app.Run(os.Args)
-	check(err)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
