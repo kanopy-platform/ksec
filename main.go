@@ -2,11 +2,13 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -19,21 +21,35 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+type keyAnnotation struct {
+	UpdatedBy   string `json:"updatedBy"`
+	LastUpdated string `json:"lastUpdated"`
+}
+
 var (
 	secretInterface apiv1.SecretInterface
 	namespace       string
+	username        string
 )
 
 func init() {
-	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	configOverrides := &clientcmd.ConfigOverrides{}
-	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
-
 	var err error
+
+	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{},
+	)
+
 	namespace, _, err = kubeConfig.Namespace()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	rawConfig, err := kubeConfig.RawConfig()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	username = rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo
 
 	config, err := kubeConfig.ClientConfig()
 	if err != nil {
@@ -109,9 +125,22 @@ func getSecretKeys(ctx *cli.Context) error {
 		return err
 	}
 
-	lines := []string{"KEY\tVALUE"}
+	lines := []string{"KEY\tVALUE\tUSER\tUPDATED"}
 	for key, value := range secret.Data {
-		lines = append(lines, fmt.Sprintf("%s\t%s", key, value))
+		rawAnnotation := secret.Annotations[fmt.Sprintf("ksec.io/%s", key)]
+
+		var jsonAnnotation []byte
+		if rawAnnotation == "" {
+			jsonAnnotation = []byte(`{"updatedBy": "", "lastUpdated": ""}`)
+		} else {
+			jsonAnnotation = []byte(rawAnnotation)
+		}
+
+		annotation := keyAnnotation{}
+		if err := json.Unmarshal(jsonAnnotation, &annotation); err != nil {
+			return err
+		}
+		lines = append(lines, fmt.Sprintf("%s\t%s\t%s\t%s", key, value, annotation.UpdatedBy, annotation.LastUpdated))
 	}
 	output_tabular(lines)
 
@@ -128,8 +157,16 @@ func setSecretKeys(ctx *cli.Context) error {
 		return err
 	}
 
+	annotation := keyAnnotation{
+		UpdatedBy:   username,
+		LastUpdated: time.Now().Format(time.RFC3339),
+	}
+
 	if secret.Data == nil {
 		secret.Data = make(map[string][]byte)
+	}
+	if secret.ObjectMeta.Annotations == nil {
+		secret.ObjectMeta.Annotations = make(map[string]string)
 	}
 
 	data := ctx.Args().Get(1)
@@ -140,6 +177,11 @@ func setSecretKeys(ctx *cli.Context) error {
 			return fmt.Errorf("Data is not formatted correctly: %s", item)
 		}
 		secret.Data[split[0]] = []byte(split[1])
+		jsonAnnotations, err := json.Marshal(annotation)
+		if err != nil {
+			return err
+		}
+		secret.ObjectMeta.Annotations[fmt.Sprintf("ksec.io/%s", split[0])] = string(jsonAnnotations)
 	}
 
 	_, err = secretInterface.Update(secret)
@@ -247,7 +289,7 @@ func pullKeys(ctx *cli.Context) error {
 }
 
 func output_tabular(lines []string) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
