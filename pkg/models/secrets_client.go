@@ -1,6 +1,9 @@
 package models
 
 import (
+	"encoding/json"
+	"fmt"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
@@ -68,11 +71,21 @@ func (s *SecretsClient) Create(name string) (*v1.Secret, error) {
 // CreateWithData creates a new Secret and passed in Data keys
 func (s *SecretsClient) CreateWithData(name string, data map[string][]byte) (*v1.Secret, error) {
 
-	// TODO: add key annotations
+	annotation := NewKeyAnnotation(s.AuthInfo)
+	annotations := make(map[string]string)
+
+	for key := range data {
+		jsonBytes, err := json.Marshal(annotation)
+		if err != nil {
+			return nil, err
+		}
+		annotations[fmt.Sprintf("%s/%s", annotationPrefix, key)] = string(jsonBytes)
+	}
 
 	secret := v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
+			Name:        name,
+			Annotations: annotations,
 		},
 		Data: data,
 	}
@@ -90,18 +103,32 @@ func (s *SecretsClient) Get(name string) (*v1.Secret, error) {
 }
 
 // Update Secret keys
-func (s *SecretsClient) Update(name string, data map[string][]byte) (*v1.Secret, error) {
+func (s *SecretsClient) Update(secret *v1.Secret, data map[string][]byte) (*v1.Secret, error) {
+	if secret.Data == nil {
+		secret.Data = make(map[string][]byte)
+	}
+	if secret.Annotations == nil {
+		secret.Annotations = make(map[string]string)
+	}
+
+	annotation := NewKeyAnnotation(s.AuthInfo)
+	for key, value := range data {
+		secret.Data[key] = value
+		jsonBytes, err := json.Marshal(annotation)
+		if err != nil {
+			return nil, err
+		}
+		secret.Annotations[fmt.Sprintf("%s/%s", annotationPrefix, key)] = string(jsonBytes)
+	}
+
+	return s.secretInterface.Update(secret)
+}
+
+// Upsert creates a Secret if needed and updates Secret keys
+func (s *SecretsClient) Upsert(name string, data map[string][]byte) (*v1.Secret, error) {
 	secret, err := s.Get(name)
 	if err != nil {
 		return s.CreateWithData(name, data)
 	}
-
-	// TODO: update key annotations
-
-	if secret.Data == nil {
-		secret.Data = make(map[string][]byte)
-	}
-	secret.Data = data
-
-	return s.secretInterface.Update(secret)
+	return s.Update(secret, data)
 }

@@ -29,17 +29,16 @@ func listCommand(ctx *cli.Context) error {
 }
 
 func createCommand(ctx *cli.Context) error {
-	if len(ctx.Args()) != 1 {
-		return fmt.Errorf("Incorrect number of arguments")
+	if len(ctx.Args()) < 1 {
+		return fmt.Errorf("No arguments specified")
 	}
 
-	name := ctx.Args().Get(0)
-	_, err := secretsClient.Create(name)
-	if err != nil {
-		return err
+	for _, name := range ctx.Args() {
+		if _, err := secretsClient.Create(name); err != nil {
+			return err
+		}
+		fmt.Printf("Created secret \"%s\"\n", name)
 	}
-
-	fmt.Printf("Created secret \"%s\"\n", name)
 	return nil
 }
 
@@ -52,7 +51,6 @@ func deleteCommand(ctx *cli.Context) error {
 		if err := secretsClient.Delete(name); err != nil {
 			return err
 		}
-
 		fmt.Printf("Deleted secret \"%s\"\n", name)
 	}
 	return nil
@@ -95,15 +93,6 @@ func setCommand(ctx *cli.Context) error {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
-	// annotation := models.KeyAnnotation{
-	// 	UpdatedBy:   secretsClient.AuthInfo,
-	// 	LastUpdated: time.Now().Format(time.RFC3339),
-	// }
-
-	// if secret.ObjectMeta.Annotations == nil {
-	// 	secret.ObjectMeta.Annotations = make(map[string]string)
-	// }
-
 	name := ctx.Args().Get(0)
 	dataArgs := ctx.Args().Get(1)
 	data := make(map[string][]byte)
@@ -114,14 +103,9 @@ func setCommand(ctx *cli.Context) error {
 			return fmt.Errorf("Data is not formatted correctly: %s", item)
 		}
 		data[split[0]] = []byte(split[1])
-		// jsonAnnotations, err := json.Marshal(annotation)
-		// if err != nil {
-		// 	return err
-		// }
-		// secret.ObjectMeta.Annotations[fmt.Sprintf("ksec.io/%s", split[0])] = string(jsonAnnotations)
 	}
 
-	_, err := secretsClient.Update(name, data)
+	_, err := secretsClient.Upsert(name, data)
 	if err != nil {
 		return err
 	}
@@ -144,10 +128,11 @@ func unsetCommand(ctx *cli.Context) error {
 
 	for _, key := range strings.Split(keys, ",") {
 		delete(secret.Data, key)
+		delete(secret.Annotations, fmt.Sprintf("ksec.io/%s", key))
 		fmt.Printf("Removed \"%s\" from secret \"%s\"\n", key, name)
 	}
 
-	_, err = secretsClient.Update(name, secret.Data)
+	_, err = secretsClient.Update(secret, secret.Data)
 	if err != nil {
 		return err
 	}
@@ -173,19 +158,14 @@ func pushCommand(ctx *cli.Context) error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		text := scanner.Text()
-		split := strings.Split(text, "=")
-
-		if len(split) != 2 {
-			return fmt.Errorf("Incorrectly formatted environment variable: %s", text)
-		}
-
+		split := strings.SplitN(text, "=", 2)
 		data[split[0]] = []byte(split[1])
 	}
 	if err := scanner.Err(); err != nil {
 		return err
 	}
 
-	_, err = secretsClient.Update(name, data)
+	_, err = secretsClient.Upsert(name, data)
 	if err != nil {
 		return err
 	}
