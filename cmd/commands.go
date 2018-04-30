@@ -43,7 +43,7 @@ func createCommand(ctx *cli.Context) error {
 	return nil
 }
 
-func deleteSecrets(ctx *cli.Context) error {
+func deleteCommand(ctx *cli.Context) error {
 	if len(ctx.Args()) < 1 {
 		return fmt.Errorf("No arguments specified")
 	}
@@ -58,7 +58,7 @@ func deleteSecrets(ctx *cli.Context) error {
 	return nil
 }
 
-func getSecretKeys(ctx *cli.Context) error {
+func getCommand(ctx *cli.Context) error {
 	if len(ctx.Args()) != 1 {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
@@ -90,7 +90,7 @@ func getSecretKeys(ctx *cli.Context) error {
 	return nil
 }
 
-func setSecretKeys(ctx *cli.Context) error {
+func setCommand(ctx *cli.Context) error {
 	if len(ctx.Args()) != 2 {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
@@ -129,7 +129,7 @@ func setSecretKeys(ctx *cli.Context) error {
 	return nil
 }
 
-func unsetSecretKeys(ctx *cli.Context) error {
+func unsetCommand(ctx *cli.Context) error {
 	if len(ctx.Args()) != 2 {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
@@ -155,7 +155,7 @@ func unsetSecretKeys(ctx *cli.Context) error {
 	return nil
 }
 
-func pushKeys(ctx *cli.Context) error {
+func pushCommand(ctx *cli.Context) error {
 	if len(ctx.Args()) != 2 {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
@@ -193,7 +193,7 @@ func pushKeys(ctx *cli.Context) error {
 	return nil
 }
 
-func pullKeys(ctx *cli.Context) error {
+func pullCommand(ctx *cli.Context) error {
 	if len(ctx.Args()) != 2 {
 		return fmt.Errorf("Incorrect number of arguments")
 	}

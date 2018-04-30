@@ -43,42 +43,42 @@ func main() {
 			Name:  "delete",
 			Usage: "Delete a Secret",
 			Action: func(ctx *cli.Context) error {
-				return deleteSecrets(ctx)
+				return deleteCommand(ctx)
 			},
 		},
 		{
 			Name:  "get",
 			Usage: "Get values from a Secret",
 			Action: func(ctx *cli.Context) error {
-				return getSecretKeys(ctx)
+				return getCommand(ctx)
 			},
 		},
 		{
 			Name:  "set",
 			Usage: "Set values in a Secret",
 			Action: func(ctx *cli.Context) error {
-				return setSecretKeys(ctx)
+				return setCommand(ctx)
 			},
 		},
 		{
 			Name:  "unset",
 			Usage: "Unset values in a Secret",
 			Action: func(ctx *cli.Context) error {
-				return unsetSecretKeys(ctx)
+				return unsetCommand(ctx)
 			},
 		},
 		{
 			Name:  "push",
 			Usage: "Push values from a .env file into a Secret",
 			Action: func(ctx *cli.Context) error {
-				return pushKeys(ctx)
+				return pushCommand(ctx)
 			},
 		},
 		{
 			Name:  "pull",
 			Usage: "Pull values from a Secret into a .env file",
 			Action: func(ctx *cli.Context) error {
-				return pullKeys(ctx)
+				return pullCommand(ctx)
 			},
 		},
 	}
