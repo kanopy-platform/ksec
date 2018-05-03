@@ -99,15 +99,15 @@ func getCommand(ctx *cli.Context) error {
 }
 
 func setCommand(ctx *cli.Context) error {
-	if len(ctx.Args()) != 2 {
+	if len(ctx.Args()) < 2 {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
 	name := ctx.Args().Get(0)
-	dataArgs := ctx.Args().Get(1)
+	dataArgs := ctx.Args()[1:]
 	data := make(map[string][]byte)
 
-	for _, item := range strings.Split(dataArgs, ",") {
+	for _, item := range dataArgs {
 		split := strings.SplitN(item, "=", 2)
 		if len(split) != 2 {
 			return fmt.Errorf("Data is not formatted correctly: %s", item)
@@ -124,19 +124,19 @@ func setCommand(ctx *cli.Context) error {
 }
 
 func unsetCommand(ctx *cli.Context) error {
-	if len(ctx.Args()) != 2 {
+	if len(ctx.Args()) < 2 {
 		return fmt.Errorf("Incorrect number of arguments")
 	}
 
 	name := ctx.Args().Get(0)
-	keys := ctx.Args().Get(1)
+	keys := ctx.Args()[1:]
 
 	secret, err := secretsClient.Get(name)
 	if err != nil {
 		return err
 	}
 
-	for _, key := range strings.Split(keys, ",") {
+	for _, key := range keys {
 		delete(secret.Data, key)
 		delete(secret.Annotations, fmt.Sprintf("ksec.io/%s", key))
 		fmt.Printf("Removed \"%s\" from secret \"%s\"\n", key, name)
