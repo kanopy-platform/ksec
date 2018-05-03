@@ -49,6 +49,12 @@ func main() {
 		{
 			Name:  "get",
 			Usage: "Get values from a Secret",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Show extra metadata",
+				},
+			},
 			Action: func(ctx *cli.Context) error {
 				return getCommand(ctx)
 			},
