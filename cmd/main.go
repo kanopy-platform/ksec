@@ -9,6 +9,8 @@ import (
 
 	"github.com/colinhoglund/helm-k8s-secrets/pkg/models"
 	"gopkg.in/urfave/cli.v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 var secretsClient *models.SecretsClient
@@ -90,11 +92,34 @@ func main() {
 	}
 
 	app.Before = func(ctx *cli.Context) error {
-		var err error
-		secretsClient, err = models.NewSecretsClient(ctx.String("namespace"))
+		kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+			clientcmd.NewDefaultClientConfigLoadingRules(),
+			&clientcmd.ConfigOverrides{},
+		)
+		config, err := kubeConfig.ClientConfig()
 		if err != nil {
 			return err
 		}
+		clientSet, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			return err
+		}
+		rawConfig, err := kubeConfig.RawConfig()
+		if err != nil {
+			return err
+		}
+
+		namespace := ctx.String("namespace")
+		authInfo := rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo
+
+		if namespace == "" {
+			namespace, _, err = kubeConfig.Namespace()
+			if err != nil {
+				return err
+			}
+		}
+
+		secretsClient = models.NewSecretsClient(namespace, authInfo, clientSet)
 		return nil
 	}
 
