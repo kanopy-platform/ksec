@@ -21,9 +21,19 @@ func listCommand(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println("NAME")
-	for _, secret := range secrets.Items {
-		fmt.Println(secret.Name)
+	if ctx.Bool("all") {
+		lines := []string{"NAME\tTYPE"}
+		for _, secret := range secrets.Items {
+			lines = append(lines, fmt.Sprintf("%s\t%s", secret.Name, secret.Type))
+		}
+		outputTabular(lines)
+	} else {
+		fmt.Println("NAME")
+		for _, secret := range secrets.Items {
+			if secret.Type == "Opaque" {
+				fmt.Println(secret.Name)
+			}
+		}
 	}
 	return nil
 }

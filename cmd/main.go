@@ -30,6 +30,12 @@ func main() {
 			Name:    "list",
 			Aliases: []string{"ls"},
 			Usage:   "List all secrets in a namespace",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "all, a",
+					Usage: "Show all secrets (Default: Opaque only)",
+				},
+			},
 			Action: func(ctx *cli.Context) error {
 				return listCommand(ctx)
 			},
