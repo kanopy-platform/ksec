@@ -9,6 +9,7 @@ import (
 
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // SecretsClient is a convenience wrapper for managing k8s Secrets
@@ -19,12 +20,39 @@ type SecretsClient struct {
 }
 
 // NewSecretsClient constructor
-func NewSecretsClient(namespace string, authInfo string, clientSet kubernetes.Interface) *SecretsClient {
+func NewSecretsClient(namespace string) (*SecretsClient, error) {
+	// initialize secrets client
+	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{},
+	)
+	config, err := kubeConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	clientSet, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	rawConfig, err := kubeConfig.RawConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	authInfo := rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo
+
+	if namespace == "" {
+		namespace, _, err = kubeConfig.Namespace()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &SecretsClient{
 		secretInterface: clientSet.CoreV1().Secrets(namespace),
 		Namespace:       namespace,
 		AuthInfo:        authInfo,
-	}
+	}, nil
 }
 
 // List all Secrets

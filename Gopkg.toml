@@ -22,10 +22,6 @@
 
 
 [[constraint]]
-  name = "gopkg.in/urfave/cli.v1"
-  version = "1.20.0"
-
-[[constraint]]
   branch = "master"
   name = "k8s.io/api"
 
