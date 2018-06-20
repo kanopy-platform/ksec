@@ -11,7 +11,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	"github.com/colinhoglund/helm-k8s-secrets/pkg/models"
+	"github.com/colinhoglund/ksec/pkg/models"
 	"gopkg.in/urfave/cli.v1"
 )
 
