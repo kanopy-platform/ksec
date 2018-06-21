@@ -9,7 +9,11 @@ import (
 var completionCmd = &cobra.Command{
 	Use:   "completion",
 	Short: "Generate completion scripts",
-	Args:  cobra.ExactArgs(1),
+	Long: `To load completions run the following command (or add to ~/.bashrc):
+
+if command -v ksec >/dev/null; then eval "$(ksec completion bash)"; fi
+`,
+	Args: cobra.ExactArgs(1),
 }
 
 var bashCompletionCmd = &cobra.Command{
