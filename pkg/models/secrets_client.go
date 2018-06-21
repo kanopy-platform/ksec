@@ -39,8 +39,6 @@ func NewSecretsClient(namespace string) (*SecretsClient, error) {
 		return nil, err
 	}
 
-	authInfo := rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo
-
 	if namespace == "" {
 		namespace, _, err = kubeConfig.Namespace()
 		if err != nil {
@@ -51,7 +49,7 @@ func NewSecretsClient(namespace string) (*SecretsClient, error) {
 	return &SecretsClient{
 		secretInterface: clientSet.CoreV1().Secrets(namespace),
 		Namespace:       namespace,
-		AuthInfo:        authInfo,
+		AuthInfo:        rawConfig.Contexts[rawConfig.CurrentContext].AuthInfo,
 	}, nil
 }
 

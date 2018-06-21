@@ -16,7 +16,11 @@ func testErr(err error, t *testing.T) {
 }
 
 func TestNewSecretsClient(t *testing.T) {
-	secretsClient = NewSecretsClient("default", "testuser", testclient.NewSimpleClientset())
+	secretsClient = &SecretsClient{
+		secretInterface: testclient.NewSimpleClientset().CoreV1().Secrets("default"),
+		Namespace:       "default",
+		AuthInfo:        "testuser",
+	}
 }
 
 func TestCreate(t *testing.T) {
@@ -52,4 +56,40 @@ func TestCreateWithData(t *testing.T) {
 
 	_, err := secretsClient.CreateWithData("test-secret-with-data", data)
 	testErr(err, t)
+}
+
+func TestGet(t *testing.T) {
+	secret, err := secretsClient.Get("test-secret-with-data")
+	testErr(err, t)
+
+	if string(secret.Data["DB_URL"]) != "mongodb://host1.example.com:27017,host2.example.com:27017/prod?replicaSet=prod" {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	secret, err := secretsClient.Get("test-secret-with-data")
+	testErr(err, t)
+
+	data := map[string][]byte{
+		"key": []byte("newvalue"),
+	}
+
+	secretsClient.Update(secret, data)
+
+	if string(secret.Data["key"]) != "newvalue" {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestUpsert(t *testing.T) {
+	data := map[string][]byte{
+		"key": []byte("upsert"),
+	}
+	secret, err := secretsClient.Upsert("upsert-secret", data)
+	testErr(err, t)
+
+	if string(secret.Data["key"]) != "upsert" {
+		t.Fatal(err.Error())
+	}
 }
