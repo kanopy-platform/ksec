@@ -15,9 +15,8 @@ import (
 
 var cfgFile string
 var secretsClient *models.SecretsClient
-var rootCmd *cobra.Command
 
-func initRootCmd() {
+func initRootCmd(rootCmd *cobra.Command) {
 	cobra.OnInitialize(initConfig)
 
 	// global options
@@ -48,7 +47,7 @@ func initRootCmd() {
 }
 
 func NewRootCmd() *cobra.Command {
-	rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:     "ksec",
 		Short:   "A tool for managing Kubernetes Secret data",
 		Version: "0.1.0",
@@ -61,7 +60,7 @@ func NewRootCmd() *cobra.Command {
 		},
 	}
 
-	initRootCmd()
+	initRootCmd(rootCmd)
 	return rootCmd
 }
 
