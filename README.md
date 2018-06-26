@@ -1,5 +1,7 @@
 ## Installation
 
+From source
+
     go get github.com/colinhoglund/ksec
 
 ## Usage
