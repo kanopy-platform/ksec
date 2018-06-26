@@ -50,8 +50,12 @@ func TestCreateSecret(t *testing.T) {
 
 	secret, err := secretsClient.Get("test")
 	testErr(err, t)
-	if string(secret.Data["key"]) != "value" {
-		t.Fatal(err.Error())
+
+	val, ok := secret.Data["key"]
+	if !ok {
+		t.Fatal("Key does not exist")
+	} else if string(val) != "value" {
+		t.Fatal("Key has incorrect value")
 	}
 }
 

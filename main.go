@@ -21,13 +21,13 @@
 package main
 
 import (
-	"log"
+	"os"
 
 	"github.com/colinhoglund/ksec/cmd"
 )
 
 func main() {
 	if err := cmd.NewRootCmd().Execute(); err != nil {
-		log.Fatal(err.Error())
+		os.Exit(1)
 	}
 }
