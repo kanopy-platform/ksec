@@ -21,7 +21,8 @@ func TestMain(m *testing.M) {
 	}
 	initRootCmd(rootCmd)
 	secretsClient = models.MockNewSecretsClient()
-	m.Run()
+	os.Exit(m.Run())
+
 }
 
 //helpers
