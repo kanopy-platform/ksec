@@ -11,7 +11,7 @@ var completionCmd = &cobra.Command{
 	Short: "Generate command completion scripts",
 	Long: `To load completions run the following command (or add to ~/.bashrc):
 
-if command -v ksec >/dev/null; then eval "$(ksec completion bash)"; fi
+	if command -v ksec >/dev/null; then eval "$(ksec completion bash)"; fi
 `,
 	Args: cobra.ExactArgs(1),
 }
