@@ -9,6 +9,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	"github.com/colinhoglund/ksec/pkg/models"
+	"github.com/colinhoglund/ksec/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -50,7 +51,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "ksec",
 		Short:   "A tool for managing Kubernetes Secret data",
-		Version: "0.1.0",
+		Version: version.Version,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			var err error
 			secretsClient, err = models.NewSecretsClient(viper.GetString("namespace"))

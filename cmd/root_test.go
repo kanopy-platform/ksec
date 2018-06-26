@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/colinhoglund/ksec/pkg/models"
+	"github.com/colinhoglund/ksec/pkg/version"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,7 @@ func TestMain(m *testing.M) {
 	rootCmd = &cobra.Command{
 		Use:     "ksec",
 		Short:   "A tool for managing Kubernetes Secret data",
-		Version: "0.1.0",
+		Version: version.Version,
 	}
 	initRootCmd(rootCmd)
 	secretsClient = models.MockNewSecretsClient()
