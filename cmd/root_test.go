@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/colinhoglund/ksec/pkg/models"
@@ -22,7 +23,25 @@ func MockNewRootCmd() *cobra.Command {
 }
 
 func TestRootCmd(t *testing.T) {
-	if err := MockNewRootCmd().Execute(); err != nil {
+	MockNewRootCmd()
+	buf := new(bytes.Buffer)
+	rootCmd.SetOutput(buf)
+	rootCmd.SetArgs([]string{
+		"list",
+	})
+	if err := rootCmd.Execute(); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestCreateCmd(t *testing.T) {
+	buf := new(bytes.Buffer)
+	rootCmd.SetOutput(buf)
+	rootCmd.SetArgs([]string{
+		"create",
+		"test",
+	})
+	if err := rootCmd.Execute(); err != nil {
 		t.Fatal(err.Error())
 	}
 }
