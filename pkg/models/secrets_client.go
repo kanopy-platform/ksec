@@ -61,6 +61,7 @@ func (s *SecretsClient) List() (*v1.SecretList, error) {
 // Create a new Secret
 func (s *SecretsClient) Create(name string) (*v1.Secret, error) {
 	secret := v1.Secret{
+		Type: v1.SecretTypeOpaque,
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
@@ -83,6 +84,7 @@ func (s *SecretsClient) CreateWithData(name string, data map[string][]byte) (*v1
 	}
 
 	secret := v1.Secret{
+		Type: v1.SecretTypeOpaque,
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        name,
 			Annotations: annotations,

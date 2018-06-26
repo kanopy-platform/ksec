@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"k8s.io/api/core/v1"
 )
 
 // listCmd represents the list command
@@ -34,7 +35,7 @@ func listCommand(cmd *cobra.Command, args []string) error {
 	} else {
 		fmt.Println("NAME")
 		for _, secret := range secrets.Items {
-			if secret.Type == "Opaque" {
+			if secret.Type == v1.SecretTypeOpaque {
 				fmt.Println(secret.Name)
 			}
 		}
