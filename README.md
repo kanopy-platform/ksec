@@ -1,3 +1,7 @@
+# ksec
+
+A command line tool that simplifies the management of Kubernetes Secrets.
+
 ## Installation
 
 From source
