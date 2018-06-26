@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -11,16 +10,16 @@ var unsetCmd = &cobra.Command{
 	Use:   "unset [secret] [key...]",
 	Short: "Unset values in a Secret",
 	Args:  cobra.MinimumNArgs(2),
-	Run:   unsetCommand,
+	RunE:  unsetCommand,
 }
 
-func unsetCommand(cmd *cobra.Command, args []string) {
+func unsetCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	keys := args[1:]
 
 	secret, err := secretsClient.Get(name)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	for _, key := range keys {
@@ -31,6 +30,8 @@ func unsetCommand(cmd *cobra.Command, args []string) {
 
 	_, err = secretsClient.Update(secret, secret.Data)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
+
+	return nil
 }

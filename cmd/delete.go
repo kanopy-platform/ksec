@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -11,14 +10,15 @@ var deleteCmd = &cobra.Command{
 	Use:   "delete [secret...]",
 	Short: "Delete a Secret",
 	Args:  cobra.MinimumNArgs(1),
-	Run:   deleteCommand,
+	RunE:  deleteCommand,
 }
 
-func deleteCommand(cmd *cobra.Command, args []string) {
+func deleteCommand(cmd *cobra.Command, args []string) error {
 	for _, name := range args {
 		if err := secretsClient.Delete(name); err != nil {
-			log.Fatal(err.Error())
+			return err
 		}
 		fmt.Printf("Deleted secret \"%s\"\n", name)
 	}
+	return nil
 }

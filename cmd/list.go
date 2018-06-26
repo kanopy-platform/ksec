@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -13,18 +12,18 @@ var listCmd = &cobra.Command{
 	Aliases: []string{"ls"},
 	Short:   "List all secrets in a namespace",
 	Args:    cobra.NoArgs,
-	Run:     listCommand,
+	RunE:    listCommand,
 }
 
-func listCommand(cmd *cobra.Command, args []string) {
+func listCommand(cmd *cobra.Command, args []string) error {
 	secrets, err := secretsClient.List()
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 	if all {
 		lines := []string{"NAME\tTYPE"}
@@ -40,4 +39,5 @@ func listCommand(cmd *cobra.Command, args []string) {
 			}
 		}
 	}
+	return nil
 }

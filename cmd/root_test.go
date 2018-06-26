@@ -2,27 +2,25 @@ package cmd
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/colinhoglund/ksec/pkg/models"
 	"github.com/spf13/cobra"
 )
 
+// mock rootCmd
 var rootCmd *cobra.Command
 
-// mock client
-func MockNewRootCmd() *cobra.Command {
-	rootCmd := &cobra.Command{
+func TestMain(m *testing.M) {
+	rootCmd = &cobra.Command{
 		Use:     "ksec",
 		Short:   "A tool for managing Kubernetes Secret data",
 		Version: "0.1.0",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			secretsClient = models.MockNewSecretsClient()
-		},
 	}
-
 	initRootCmd(rootCmd)
-	return rootCmd
+	secretsClient = models.MockNewSecretsClient()
+	m.Run()
 }
 
 //helpers
@@ -32,7 +30,7 @@ func testErr(err error, t *testing.T) {
 	}
 }
 
-func exec(args []string) (*bytes.Buffer, error) {
+func cmdExec(args []string) (*bytes.Buffer, error) {
 	buf := new(bytes.Buffer)
 	rootCmd.SetOutput(buf)
 	rootCmd.SetArgs(args)
@@ -43,13 +41,26 @@ func exec(args []string) (*bytes.Buffer, error) {
 }
 
 // tests
-func TestRootCmd(t *testing.T) {
-	rootCmd = MockNewRootCmd()
-	_, err := exec([]string{"list"})
+func TestCreateSecret(t *testing.T) {
+	_, err := cmdExec([]string{"create", "test"})
 	testErr(err, t)
+
+	_, err = cmdExec([]string{"set", "test", "key=value"})
+	testErr(err, t)
+
+	secret, err := secretsClient.Get("test")
+	testErr(err, t)
+	if string(secret.Data["key"]) != "value" {
+		t.Fatal(err.Error())
+	}
 }
 
-func TestCreateCmd(t *testing.T) {
-	_, err := exec([]string{"create", "test"})
+func TestDeleteSecret(t *testing.T) {
+	_, err := cmdExec([]string{"delete", "test"})
 	testErr(err, t)
+
+	_, err = cmdExec([]string{"get", "test"})
+	if !strings.HasSuffix(err.Error(), "not found") {
+		t.Fatal("Secret still exists")
+	}
 }

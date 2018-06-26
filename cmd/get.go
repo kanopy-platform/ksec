@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/colinhoglund/ksec/pkg/models"
 	"github.com/spf13/cobra"
@@ -13,19 +12,19 @@ var getCmd = &cobra.Command{
 	Use:   "get [secret]",
 	Short: "Get values from a Secret",
 	Args:  cobra.ExactArgs(1),
-	Run:   getCommand,
+	RunE:  getCommand,
 }
 
-func getCommand(cmd *cobra.Command, args []string) {
+func getCommand(cmd *cobra.Command, args []string) error {
 	secret, err := secretsClient.Get(args[0])
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	var lines []string
 	verbose, err := cmd.Flags().GetBool("verbose")
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	if verbose {
@@ -41,7 +40,7 @@ func getCommand(cmd *cobra.Command, args []string) {
 
 			annotation := models.KeyAnnotation{}
 			if err := json.Unmarshal(jsonAnnotation, &annotation); err != nil {
-				log.Fatal(err.Error())
+				return err
 			}
 			lines = append(lines, fmt.Sprintf("Key:\t%s", key))
 			lines = append(lines, fmt.Sprintf("Value:\t%s", value))
@@ -55,4 +54,5 @@ func getCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 	outputTabular(lines)
+	return nil
 }
