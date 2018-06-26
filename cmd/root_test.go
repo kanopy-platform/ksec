@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"bytes"
+	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 
@@ -26,26 +27,24 @@ func TestMain(m *testing.M) {
 //helpers
 func testErr(err error, t *testing.T) {
 	if err != nil {
-		t.Fatal(err.Error())
+		t.Fatal(err)
 	}
 }
 
-func cmdExec(args []string) (*bytes.Buffer, error) {
-	buf := new(bytes.Buffer)
-	rootCmd.SetOutput(buf)
+func cmdExec(args []string) error {
 	rootCmd.SetArgs(args)
 	if err := rootCmd.Execute(); err != nil {
-		return &bytes.Buffer{}, err
+		return err
 	}
-	return buf, nil
+	return nil
 }
 
 // tests
 func TestCreateSecret(t *testing.T) {
-	_, err := cmdExec([]string{"create", "test"})
+	err := cmdExec([]string{"create", "test"})
 	testErr(err, t)
 
-	_, err = cmdExec([]string{"set", "test", "key=value"})
+	err = cmdExec([]string{"set", "test", "key=value"})
 	testErr(err, t)
 
 	secret, err := secretsClient.Get("test")
@@ -59,12 +58,50 @@ func TestCreateSecret(t *testing.T) {
 	}
 }
 
-func TestDeleteSecret(t *testing.T) {
-	_, err := cmdExec([]string{"delete", "test"})
+func TestUnsetSecretKey(t *testing.T) {
+	err := cmdExec([]string{"unset", "test", "key"})
 	testErr(err, t)
 
-	_, err = cmdExec([]string{"get", "test"})
+	secret, err := secretsClient.Get("test")
+	testErr(err, t)
+
+	if _, ok := secret.Data["key"]; ok {
+		t.Fatal("Key should not exist")
+	}
+}
+
+func TestDeleteSecret(t *testing.T) {
+	err := cmdExec([]string{"delete", "test"})
+	testErr(err, t)
+
+	err = cmdExec([]string{"get", "test"})
 	if !strings.HasSuffix(err.Error(), "not found") {
 		t.Fatal("Secret still exists")
 	}
+}
+
+func TestPushSecret(t *testing.T) {
+	content := []byte("ENV_VAR=secret")
+	tempfile, err := ioutil.TempFile("", "example")
+	testErr(err, t)
+	defer os.Remove(tempfile.Name())
+
+	_, err = tempfile.Write(content)
+	testErr(err, t)
+
+	err = cmdExec([]string{"push", tempfile.Name(), "pushtest"})
+	testErr(err, t)
+
+	secret, err := secretsClient.Get("pushtest")
+	testErr(err, t)
+
+	val, ok := secret.Data["ENV_VAR"]
+	if !ok {
+		t.Fatal("Key does not exist")
+	} else if string(val) != "secret" {
+		t.Fatal("Key has incorrect value")
+	}
+
+	err = tempfile.Close()
+	testErr(err, t)
 }
