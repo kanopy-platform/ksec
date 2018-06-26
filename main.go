@@ -27,8 +27,7 @@ import (
 )
 
 func main() {
-	rootCmd := cmd.NewRootCmd()
-	if err := rootCmd.Execute(); err != nil {
+	if err := cmd.NewRootCmd().Execute(); err != nil {
 		log.Fatal(err.Error())
 	}
 }

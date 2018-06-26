@@ -15,14 +15,9 @@ import (
 
 var cfgFile string
 var secretsClient *models.SecretsClient
+var rootCmd *cobra.Command
 
-func baseNewRootCmd() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Use:     "ksec",
-		Short:   "A tool for managing Kubernetes Secret data",
-		Version: "0.1.0",
-	}
-
+func initRootCmd() {
 	cobra.OnInitialize(initConfig)
 
 	// global options
@@ -50,20 +45,23 @@ func baseNewRootCmd() *cobra.Command {
 	rootCmd.AddCommand(completionCmd)
 	completionCmd.AddCommand(bashCompletionCmd)
 	completionCmd.AddCommand(zshCompletionCmd)
-
-	return rootCmd
 }
 
 func NewRootCmd() *cobra.Command {
-	rootCmd := baseNewRootCmd()
-
-	// load secretsClient after creating rootCmd to ensure the `namespace` config is picked up
-	var err error
-	secretsClient, err = models.NewSecretsClient(viper.GetString("namespace"))
-	if err != nil {
-		log.Fatal(err.Error())
+	rootCmd = &cobra.Command{
+		Use:     "ksec",
+		Short:   "A tool for managing Kubernetes Secret data",
+		Version: "0.1.0",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			var err error
+			secretsClient, err = models.NewSecretsClient(viper.GetString("namespace"))
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+		},
 	}
 
+	initRootCmd()
 	return rootCmd
 }
 

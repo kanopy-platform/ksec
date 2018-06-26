@@ -3,24 +3,20 @@ package models
 import (
 	"strings"
 	"testing"
-
-	testclient "k8s.io/client-go/kubernetes/fake"
 )
 
 var secretsClient *SecretsClient
 
+// helpers
 func testErr(err error, t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 }
 
+// unit tests
 func TestNewSecretsClient(t *testing.T) {
-	secretsClient = &SecretsClient{
-		secretInterface: testclient.NewSimpleClientset().CoreV1().Secrets("default"),
-		Namespace:       "default",
-		AuthInfo:        "testuser",
-	}
+	secretsClient = MockNewSecretsClient()
 }
 
 func TestCreate(t *testing.T) {
