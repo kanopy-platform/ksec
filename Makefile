@@ -8,4 +8,4 @@ test:
 
 .PHONY: build
 build:
-	go build
+	go install
