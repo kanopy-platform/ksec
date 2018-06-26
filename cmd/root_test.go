@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -83,7 +84,7 @@ func TestDeleteSecret(t *testing.T) {
 
 func TestPushSecret(t *testing.T) {
 	content := []byte("ENV_VAR=secret")
-	tempfile, err := ioutil.TempFile("", "example")
+	tempfile, err := ioutil.TempFile("", "ksec")
 	testErr(err, t)
 	defer os.Remove(tempfile.Name())
 
@@ -105,4 +106,24 @@ func TestPushSecret(t *testing.T) {
 
 	err = tempfile.Close()
 	testErr(err, t)
+}
+
+func TestPullSecret(t *testing.T) {
+	tempfile, err := ioutil.TempFile("", "ksec")
+	testErr(err, t)
+	defer os.Remove(tempfile.Name())
+
+	err = cmdExec([]string{"set", "pulltest", "ENV_VAR=secret"})
+	testErr(err, t)
+
+	err = cmdExec([]string{"pull", "pulltest", tempfile.Name()})
+	testErr(err, t)
+
+	reader := bufio.NewReader(tempfile)
+	line, _, err := reader.ReadLine()
+	testErr(err, t)
+
+	if string(line) != "ENV_VAR=secret" {
+		t.Fatal("File does not contain pulled contents")
+	}
 }
