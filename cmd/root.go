@@ -16,37 +16,55 @@ import (
 var cfgFile string
 var secretsClient *models.SecretsClient
 
-// RootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
-	Use:     "ksec",
-	Short:   "A tool for managing Kubernetes Secret data",
-	Version: "0.1.0",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		var err error
-		secretsClient, err = models.NewSecretsClient(viper.GetString("namespace"))
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	},
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := RootCmd.Execute(); err != nil {
-		log.Fatal(err.Error())
+func baseNewRootCmd() *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:     "ksec",
+		Short:   "A tool for managing Kubernetes Secret data",
+		Version: "0.1.0",
 	}
-}
 
-func init() {
 	cobra.OnInitialize(initConfig)
 
 	// global options
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (Default: $HOME/.ksec.yaml)")
-	RootCmd.PersistentFlags().StringP("namespace", "n", "", "Operate in a specific NAMESPACE (Default: current kubeconfig namespace)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (Default: $HOME/.ksec.yaml)")
+	rootCmd.PersistentFlags().StringP("namespace", "n", "", "Operate in a specific NAMESPACE (Default: current kubeconfig namespace)")
 
 	// setup viper config
-	viper.BindPFlags(RootCmd.PersistentFlags())
+	viper.BindPFlags(rootCmd.PersistentFlags())
+
+	// subcommands without extra options
+	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(deleteCmd)
+	rootCmd.AddCommand(pullCmd)
+	rootCmd.AddCommand(pushCmd)
+	rootCmd.AddCommand(setCmd)
+	rootCmd.AddCommand(unsetCmd)
+
+	// subcommands with extra options
+	rootCmd.AddCommand(getCmd)
+	getCmd.Flags().BoolP("verbose", "v", false, "Show extra metadata")
+
+	rootCmd.AddCommand(listCmd)
+	listCmd.Flags().BoolP("all", "a", false, "Show all secrets (Default: Opaque only)")
+
+	rootCmd.AddCommand(completionCmd)
+	completionCmd.AddCommand(bashCompletionCmd)
+	completionCmd.AddCommand(zshCompletionCmd)
+
+	return rootCmd
+}
+
+func NewRootCmd() *cobra.Command {
+	rootCmd := baseNewRootCmd()
+
+	// load secretsClient after creating rootCmd to ensure the `namespace` config is picked up
+	var err error
+	secretsClient, err = models.NewSecretsClient(viper.GetString("namespace"))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return rootCmd
 }
 
 // initConfig reads in config file and ENV variables if set.

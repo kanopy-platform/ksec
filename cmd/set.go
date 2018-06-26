@@ -14,10 +14,6 @@ var setCmd = &cobra.Command{
 	Run:   setCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(setCmd)
-}
-
 func setCommand(cmd *cobra.Command, args []string) {
 	name := args[0]
 	dataArgs := args[1:]

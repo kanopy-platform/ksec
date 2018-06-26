@@ -14,10 +14,6 @@ var createCmd = &cobra.Command{
 	Run:   createCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(createCmd)
-}
-
 func createCommand(cmd *cobra.Command, args []string) {
 	for _, name := range args {
 		if _, err := secretsClient.Create(name); err != nil {

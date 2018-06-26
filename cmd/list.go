@@ -16,12 +16,6 @@ var listCmd = &cobra.Command{
 	Run:     listCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(listCmd)
-
-	listCmd.Flags().BoolP("all", "a", false, "Show all secrets (Default: Opaque only)")
-}
-
 func listCommand(cmd *cobra.Command, args []string) {
 	secrets, err := secretsClient.List()
 	if err != nil {

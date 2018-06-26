@@ -14,10 +14,6 @@ var unsetCmd = &cobra.Command{
 	Run:   unsetCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(unsetCmd)
-}
-
 func unsetCommand(cmd *cobra.Command, args []string) {
 	name := args[0]
 	keys := args[1:]

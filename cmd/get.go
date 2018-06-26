@@ -16,12 +16,6 @@ var getCmd = &cobra.Command{
 	Run:   getCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(getCmd)
-
-	getCmd.Flags().BoolP("verbose", "v", false, "Show extra metadata")
-}
-
 func getCommand(cmd *cobra.Command, args []string) {
 	secret, err := secretsClient.Get(args[0])
 	if err != nil {

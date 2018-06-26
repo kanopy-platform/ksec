@@ -21,7 +21,7 @@ var bashCompletionCmd = &cobra.Command{
 	Short: "Generate bash completion script",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		RootCmd.GenBashCompletion(os.Stdout)
+		cmd.GenBashCompletion(os.Stdout)
 	},
 }
 
@@ -30,12 +30,6 @@ var zshCompletionCmd = &cobra.Command{
 	Short: "Generate zsh completion script",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		RootCmd.GenZshCompletion(os.Stdout)
+		cmd.GenZshCompletion(os.Stdout)
 	},
-}
-
-func init() {
-	RootCmd.AddCommand(completionCmd)
-	completionCmd.AddCommand(bashCompletionCmd)
-	completionCmd.AddCommand(zshCompletionCmd)
 }

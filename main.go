@@ -20,8 +20,15 @@
 
 package main
 
-import "github.com/colinhoglund/ksec/cmd"
+import (
+	"log"
+
+	"github.com/colinhoglund/ksec/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	rootCmd := cmd.NewRootCmd()
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err.Error())
+	}
 }

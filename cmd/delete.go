@@ -14,10 +14,6 @@ var deleteCmd = &cobra.Command{
 	Run:   deleteCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(deleteCmd)
-}
-
 func deleteCommand(cmd *cobra.Command, args []string) {
 	for _, name := range args {
 		if err := secretsClient.Delete(name); err != nil {

@@ -16,10 +16,6 @@ var pushCmd = &cobra.Command{
 	Run:   pushCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(pushCmd)
-}
-
 func pushCommand(cmd *cobra.Command, args []string) {
 	fileArg := args[0]
 	name := args[1]

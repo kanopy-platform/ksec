@@ -15,10 +15,6 @@ var pullCmd = &cobra.Command{
 	Run:   pullCommand,
 }
 
-func init() {
-	RootCmd.AddCommand(pullCmd)
-}
-
 func pullCommand(cmd *cobra.Command, args []string) {
 	name := args[0]
 
