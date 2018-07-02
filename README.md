@@ -8,6 +8,10 @@ From source
 
     go get github.com/colinhoglund/ksec
 
+As a Helm plugin
+
+    helm plugin install https://github.com/colinhoglund/ksec
+
 ## Usage
 ```
 A tool for managing Kubernetes Secret data
