@@ -5,3 +5,5 @@ description: "Helm plugin that simplifies the management of Kubernetes Secrets"
 ignoreFlags: false
 useTunnel: false
 command: "$HELM_PLUGIN_DIR/ksec"
+hooks:
+  install: "$HELM_PLUGIN_DIR/install-binary.sh"
