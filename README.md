@@ -4,13 +4,15 @@ A command line tool that simplifies the management of Kubernetes Secrets.
 
 ## Installation
 
-From source
+Compiled binaries can be found in the [GitHub releases](https://github.com/colinhoglund/ksec/releases).
 
-    go get github.com/colinhoglund/ksec
-
-As a Helm plugin
+Install compiled binary as a Helm plugin (requires [Helm](https://docs.helm.sh/using_helm/#installing-helm)).
 
     helm plugin install https://github.com/colinhoglund/ksec
+
+Install from source (requires [golang](https://golang.org/doc/install#install)).
+
+    go get github.com/colinhoglund/ksec
 
 ## Usage
 ```
