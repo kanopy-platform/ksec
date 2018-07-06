@@ -12,7 +12,7 @@ Install compiled binary as a Helm plugin (requires [Helm](https://docs.helm.sh/u
 
 Install from source (requires [golang](https://golang.org/doc/install#install)).
 
-    go get github.com/colinhoglund/ksec
+    go get github.com/colinhoglund/ksec/cmd/...
 
 ## Usage
 ```
