@@ -1,8 +1,9 @@
-package cmd
+package main
 
 import (
 	"fmt"
 	"log"
+	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -88,5 +89,11 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+func main() {
+	if err := NewRootCmd().Execute(); err != nil {
+		os.Exit(1)
 	}
 }

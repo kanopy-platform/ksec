@@ -6,4 +6,4 @@ ignoreFlags: false
 useTunnel: false
 command: "$HELM_PLUGIN_DIR/ksec"
 hooks:
-  install: "$HELM_PLUGIN_DIR/install-binary.sh"
+  install: "$HELM_PLUGIN_DIR/scripts/install-binary.sh"

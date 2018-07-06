@@ -11,16 +11,16 @@ test:
 
 .PHONY: build
 build:
-	go install
+	go install ./cmd/ksec/
 
 .PHONY: dist
 dist:
 	mkdir -p $(DIST)
-	GOOS=linux GOARCH=amd64 go build -o ksec ./main.go
+	GOOS=linux GOARCH=amd64 go build -o ksec ./cmd/ksec/
 	tar -zcvf $(DIST)/ksec-linux-$(VERSION).tgz ksec README.md LICENSE plugin.yaml
-	GOOS=darwin GOARCH=amd64 go build -o ksec ./main.go
+	GOOS=darwin GOARCH=amd64 go build -o ksec ./cmd/ksec/
 	tar -zcvf $(DIST)/ksec-macos-$(VERSION).tgz ksec README.md LICENSE plugin.yaml
-	GOOS=windows GOARCH=amd64 go build -o ksec.exe ./main.go
+	GOOS=windows GOARCH=amd64 go build -o ksec.exe ./cmd/ksec/
 	tar -zcvf $(DIST)/ksec-windows-$(VERSION).tgz ksec.exe README.md LICENSE plugin.yaml
 
 .PHONY: clean
