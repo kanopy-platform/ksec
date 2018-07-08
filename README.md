@@ -41,3 +41,9 @@ Flags:
 
 Use "ksec [command] --help" for more information about a command.
 ```
+
+## Development
+
+Run `make` to run all tests and create a new binary in `${GOPATH}/bin/`
+
+Run `make dist` to cross compile binaries into a `./_dist/` directory. These binaries can then be uploaded to a new GitHub release.
