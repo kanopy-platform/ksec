@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/colinhoglund/ksec/pkg/models"
+	"github.com/10gen-ops/ksec/pkg/models"
 	"github.com/spf13/cobra"
 )
 
