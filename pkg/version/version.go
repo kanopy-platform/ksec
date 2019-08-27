@@ -1,3 +1,4 @@
 package version
 
-const Version = "0.1.1"
+// Version sets the release version for ksec
+const Version = "0.1.2"
