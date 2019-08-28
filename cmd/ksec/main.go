@@ -40,6 +40,9 @@ func initRootCmd(rootCmd *cobra.Command) {
 	rootCmd.AddCommand(getCmd)
 	getCmd.Flags().BoolP("verbose", "v", false, "Show extra metadata")
 
+	rootCmd.AddCommand(deleteCmd)
+	deleteCmd.Flags().BoolP("yes", "y", false, "do not ask for confirmation")
+
 	rootCmd.AddCommand(listCmd)
 	listCmd.Flags().BoolP("all", "a", false, "Show all secrets (Default: Opaque only)")
 
