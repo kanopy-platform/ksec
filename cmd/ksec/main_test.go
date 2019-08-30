@@ -74,7 +74,7 @@ func TestUnsetSecretKey(t *testing.T) {
 }
 
 func TestDeleteSecret(t *testing.T) {
-	err := cmdExec([]string{"delete", "test"})
+	err := cmdExec([]string{"delete", "test", "--yes"})
 	testErr(err, t)
 
 	err = cmdExec([]string{"get", "test"})
