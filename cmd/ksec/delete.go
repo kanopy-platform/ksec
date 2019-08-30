@@ -19,6 +19,13 @@ func deleteCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	for _, name := range args {
+		if _, err := secretsClient.Get(name); err != nil {
+			fmt.Println(err)
+			return nil
+		}
+	}
+
 	if !skipconfirm && !askConfirmation("Are you sure? This action cannot be reversed.") {
 		fmt.Println("canceled")
 		return nil
