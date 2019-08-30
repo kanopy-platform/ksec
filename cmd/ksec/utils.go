@@ -21,8 +21,9 @@ func askConfirmation(message string) bool {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	response := scanner.Text()
-	if scanner.Err() != nil {
-		return false
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "invalid input: ", err)
+		os.Exit(1)
 	}
 
 	if response == "y" {
