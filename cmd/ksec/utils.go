@@ -22,7 +22,7 @@ func askConfirmation(message string) bool {
 	scanner.Scan()
 	response := scanner.Text()
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "invalid input: ", err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 

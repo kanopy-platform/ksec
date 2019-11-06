@@ -30,7 +30,6 @@ func initRootCmd(rootCmd *cobra.Command) {
 
 	// subcommands without extra options
 	rootCmd.AddCommand(createCmd)
-	rootCmd.AddCommand(deleteCmd)
 	rootCmd.AddCommand(pullCmd)
 	rootCmd.AddCommand(pushCmd)
 	rootCmd.AddCommand(setCmd)

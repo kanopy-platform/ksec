@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -21,17 +22,16 @@ func deleteCommand(cmd *cobra.Command, args []string) error {
 
 	for _, name := range args {
 		if _, err := secretsClient.Get(name); err != nil {
-			fmt.Println(err)
-			return nil
+			fmt.Fprintln(os.Stderr, err)
+			continue
 		}
-	}
 
-	if !skipconfirm && !askConfirmation("Are you sure? This action cannot be reversed.") {
-		fmt.Println("canceled")
-		return nil
-	}
+		confirmationMessage := fmt.Sprintf(`Delete secret "%s"? This action cannot be reversed.`, name)
+		if !skipconfirm && !askConfirmation(confirmationMessage) {
+			fmt.Println("Delete canceled")
+			continue
+		}
 
-	for _, name := range args {
 		if err := secretsClient.Delete(name); err != nil {
 			return err
 		}
