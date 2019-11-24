@@ -1,6 +1,9 @@
 # ksec
 
 A command line tool that simplifies the management of Kubernetes Secrets.
+- Easily set and unset k8s Secret keys
+- Handles base64 encoding
+- Supports synchronization of `.env` files to k8s Secrets
 
 ## Installation
 
