@@ -30,7 +30,6 @@ func initRootCmd(rootCmd *cobra.Command) {
 
 	// subcommands without extra options
 	rootCmd.AddCommand(createCmd)
-	rootCmd.AddCommand(deleteCmd)
 	rootCmd.AddCommand(pullCmd)
 	rootCmd.AddCommand(pushCmd)
 	rootCmd.AddCommand(setCmd)
@@ -39,6 +38,9 @@ func initRootCmd(rootCmd *cobra.Command) {
 	// subcommands with extra options
 	rootCmd.AddCommand(getCmd)
 	getCmd.Flags().BoolP("verbose", "v", false, "Show extra metadata")
+
+	rootCmd.AddCommand(deleteCmd)
+	deleteCmd.Flags().BoolP("yes", "y", false, "do not ask for confirmation")
 
 	rootCmd.AddCommand(listCmd)
 	listCmd.Flags().BoolP("all", "a", false, "Show all secrets (Default: Opaque only)")
