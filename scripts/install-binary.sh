@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PROJECT_NAME="ksec"
-PROJECT_GH="10gen-ops/$PROJECT_NAME"
+PROJECT_GH="colinhoglund/$PROJECT_NAME"
 
 : ${HELM_PLUGIN_PATH:="$(helm home)/plugins/${PROJECT_NAME}"}
 

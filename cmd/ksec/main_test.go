@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/10gen-ops/ksec/pkg/models"
-	"github.com/10gen-ops/ksec/pkg/version"
+	"github.com/colinhoglund/ksec/pkg/models"
+	"github.com/colinhoglund/ksec/pkg/version"
 	"github.com/spf13/cobra"
 )
 
