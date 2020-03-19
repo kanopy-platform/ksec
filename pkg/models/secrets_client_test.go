@@ -63,6 +63,20 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestGetKey(t *testing.T) {
+	value, err := secretsClient.GetKey("test-secret-with-data", "secret-key")
+	testErr(err, t)
+
+	if value != "secret-value" {
+		t.Fatal(err.Error())
+	}
+
+	value, err = secretsClient.GetKey("test-secret-with_data", "thiskeydoesnotexist")
+	if err == nil {
+		t.Fatal("non-existent key should have received an error")
+	}
+}
+
 func TestUpdate(t *testing.T) {
 	secret, err := secretsClient.Get("test-secret-with-data")
 	testErr(err, t)

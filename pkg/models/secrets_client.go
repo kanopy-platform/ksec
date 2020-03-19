@@ -104,6 +104,21 @@ func (s *SecretsClient) Get(name string) (*v1.Secret, error) {
 	return s.secretInterface.Get(name, metav1.GetOptions{})
 }
 
+// GetKey retrieves an individual keys value from a secret
+func (s *SecretsClient) GetKey(name, key string) (string, error) {
+	secret, err := s.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	value, ok := secret.Data[key]
+	if !ok {
+		return "", fmt.Errorf("secret key %s does not exist", key)
+	}
+
+	return string(value), nil
+}
+
 // Update Secret keys
 func (s *SecretsClient) Update(secret *v1.Secret, data map[string][]byte) (*v1.Secret, error) {
 	if secret.Data == nil {

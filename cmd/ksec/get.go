@@ -9,14 +9,26 @@ import (
 )
 
 var getCmd = &cobra.Command{
-	Use:   "get [secret]",
+	Use:   "get [secret] [key]",
 	Short: "Get values from a Secret",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(1, 2),
 	RunE:  getCommand,
 }
 
 func getCommand(cmd *cobra.Command, args []string) error {
-	secret, err := secretsClient.Get(args[0])
+	secretName := args[0]
+
+	if len(args) > 1 {
+		value, err := secretsClient.GetKey(secretName, args[1])
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(value)
+		return nil
+	}
+
+	secret, err := secretsClient.Get(secretName)
 	if err != nil {
 		return err
 	}
