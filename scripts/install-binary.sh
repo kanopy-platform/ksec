@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
+if [ -n "${HELM_LINTER_PLUGIN_NO_INSTALL_HOOK}" ]; then
+    echo "Development mode: not downloading versioned release."
+    exit 0
+fi
+
 PROJECT_NAME="ksec"
 PROJECT_GH="10gen-ops/$PROJECT_NAME"
 
-: ${HELM_PLUGIN_PATH:="$(helm home)/plugins/${PROJECT_NAME}"}
+: ${HELM_PLUGIN_PATH:="$(pwd)/${PROJECT_NAME}"}
 
 # Convert the HELM_PLUGIN_PATH to unix if cygpath is
 # available. This is the case when using MSYS2 or Cygwin
 # on Windows where helm returns a Windows path but we
 # need a Unix path
-if type cygpath > /dev/null; then
+if type cygpath 2> /dev/null; then
   HELM_PLUGIN_PATH=$(cygpath -u $HELM_PLUGIN_PATH)
 fi
 
@@ -109,7 +114,7 @@ fail_trap() {
 # testVersion tests the installed client to make sure it is working.
 testVersion() {
   set +e
-  echo "$PROJECT_NAME installed into $HELM_PLUGIN_PATH/$PROJECT_NAME"
+  echo "$PROJECT_NAME installed into $HELM_PLUGIN_PATH"
   # To avoid to keep track of the Windows suffix,
   # call the plugin assuming it is in the PATH
   PATH=$PATH:$HELM_PLUGIN_PATH
