@@ -48,13 +48,14 @@ initOS() {
     # Minimalist GNU for Windows
     mingw*) OS='windows';;
     darwin) OS='macos';;
+    linux) OS='linux';;
   esac
 }
 
 # verifySupported checks that the os/arch combination is supported for
 # binary builds.
 verifySupported() {
-  local supported="linux-amd64\nmacos-amd64\nwindows-amd64"
+  local supported="linux-amd64\nmacos-amd64\nmacos-arm64\nwindows-amd64"
   if ! echo "${supported}" | grep -q "${OS}-${ARCH}"; then
     echo "No prebuild binary for ${OS}-${ARCH}."
     exit 1
@@ -70,11 +71,14 @@ verifySupported() {
 getDownloadURL() {
   # Use the GitHub API to find the latest version for this project.
   local latest_url="https://api.github.com/repos/$PROJECT_GH/releases/latest"
+  local version
   if type "curl" > /dev/null; then
-    DOWNLOAD_URL=$(curl -s $latest_url | grep $OS | awk '/\"browser_download_url\":/{gsub( /[,\"]/,"", $2); print $2}')
+    version=$(curl -s $latest_url | awk '/\"tag_name\":/{gsub( /[,\"]/,"", $2); print $2}')
   elif type "wget" > /dev/null; then
-    DOWNLOAD_URL=$(wget -q -O - $latest_url | awk '/\"browser_download_url\":/{gsub( /[,\"]/,"", $2); print $2}')
+    version=$(wget -q -O - $latest_url | awk '/\"tag_name\":/{gsub( /[,\"]/,"", $2); print $2}')
   fi
+
+  DOWNLOAD_URL="https://github.com/$PROJECT_GH/releases/download/$version/$PROJECT_NAME-$OS-$ARCH-$version.tgz"
 }
 
 # downloadFile downloads the latest binary package and also the checksum
