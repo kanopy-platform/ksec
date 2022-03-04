@@ -17,13 +17,13 @@ build:
 dist:
 	mkdir -p $(DIST)
 	GOOS=linux GOARCH=amd64 go build -o ksec ./cmd/ksec/
-	tar -zcvf $(DIST)/ksec-linux-amd64.tgz ksec README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/ksec-linux-amd64-$(VERSION).tgz ksec README.md LICENSE plugin.yaml
 	GOOS=darwin GOARCH=amd64 go build -o ksec ./cmd/ksec/
-	tar -zcvf $(DIST)/ksec-macos-amd64.tgz ksec README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/ksec-macos-amd64-$(VERSION).tgz ksec README.md LICENSE plugin.yaml
 	GOOS=darwin GOARCH=arm64 go build -o ksec ./cmd/ksec/
-	tar -zcvf $(DIST)/ksec-macos-arm64.tgz ksec README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/ksec-macos-arm64-$(VERSION).tgz ksec README.md LICENSE plugin.yaml
 	GOOS=windows GOARCH=amd64 go build -o ksec.exe ./cmd/ksec/
-	tar -zcvf $(DIST)/ksec-windows-amd64.tgz ksec.exe README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/ksec-windows-amd64-$(VERSION).tgz ksec.exe README.md LICENSE plugin.yaml
 
 .PHONY: clean
 clean:

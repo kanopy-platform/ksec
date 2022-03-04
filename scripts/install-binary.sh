@@ -69,7 +69,15 @@ verifySupported() {
 
 # getDownloadURL checks the latest available version.
 getDownloadURL() {
-  DOWNLOAD_URL="https://github.com/$PROJECT_GH/releases/latest/download/ksec-$OS-$ARCH.tgz"
+  local latest_url="https://api.github.com/repos/$PROJECT_GH/releases/latest"
+  local version
+  if type "curl" > /dev/null; then
+    version=$(curl -s $latest_url | awk '/\"tag_name\":/{gsub( /[,\"]/,"", $2); print $2}')
+  elif type "wget" > /dev/null; then
+    version=$(wget -q -O - $latest_url | awk '/\"tag_name\":/{gsub( /[,\"]/,"", $2); print $2}')
+  fi
+
+  DOWNLOAD_URL="https://github.com/$PROJECT_GH/releases/download/$version/$PROJECT_NAME-$OS-$ARCH-$version.tgz"
 }
 
 # downloadFile downloads the latest binary package and also the checksum
