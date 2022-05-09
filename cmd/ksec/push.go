@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"strings"
 
@@ -17,7 +18,7 @@ var pushCmd = &cobra.Command{
 
 func pushCommand(cmd *cobra.Command, args []string) error {
 	fileArg := args[0]
-	name := args[1]
+	secretName := args[1]
 	data := make(map[string][]byte)
 
 	file, err := os.Open(fileArg)
@@ -26,19 +27,25 @@ func pushCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	if err := scanSecretData(file, data); err != nil {
+		return err
+	}
+
+	_, err = secretsClient.Upsert(secretName, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func scanSecretData(reader io.Reader, data map[string][]byte) error {
+	scanner := bufio.NewScanner(reader)
+
 	for scanner.Scan() {
 		text := scanner.Text()
 		split := strings.SplitN(text, "=", 2)
 		data[split[0]] = []byte(split[1])
 	}
-	if err := scanner.Err(); err != nil {
-		return err
-	}
 
-	_, err = secretsClient.Upsert(name, data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return scanner.Err()
 }
