@@ -12,6 +12,8 @@ Install compiled binary as a Helm plugin (requires [Helm](https://docs.helm.sh/u
 
     helm plugin install https://github.com/10gen-ops/ksec
 
+Please Note: This may not work on Windows if you have spaces in your `HELM_HOME` path. You can instead download the windows executable from the [latest release](https://github.com/10gen-ops/ksec/releases/latest).
+
 Install from source (requires [golang](https://golang.org/doc/install#install)).
 
     go get github.com/10gen-ops/ksec/cmd/...
