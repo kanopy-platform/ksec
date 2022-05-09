@@ -42,9 +42,11 @@ func scanSecretData(reader io.Reader, data map[string][]byte) error {
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
-		text := scanner.Text()
-		split := strings.SplitN(text, "=", 2)
-		data[split[0]] = []byte(split[1])
+		split := strings.SplitN(scanner.Text(), "=", 2)
+
+		if len(split) > 1 {
+			data[split[0]] = []byte(split[1])
+		}
 	}
 
 	return scanner.Err()
