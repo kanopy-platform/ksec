@@ -1,7 +1,5 @@
 # ksec
 
-[![Build Status](https://cloud.drone.io/api/badges/kanopy-platform/ksec/status.svg)](https://cloud.drone.io/kanopy-platform/ksec)
-
 A command line tool that simplifies the management of Kubernetes Secrets.
 - Easily set and unset k8s Secret keys
 - Handles base64 encoding
