@@ -1,6 +1,6 @@
 # ksec
 
-**PLEASE NOTE:** FYI, this repo has been archived in favor of https://github.com/kanopy-platform/ksec.
+**PLEASE NOTE:** This repo has been archived in favor of https://github.com/kanopy-platform/ksec.
 
 [![Build Status](https://cloud.drone.io/api/badges/10gen-ops/ksec/status.svg)](https://cloud.drone.io/10gen-ops/ksec)
 
