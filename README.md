@@ -3,6 +3,9 @@
 [![Build Status](https://cloud.drone.io/api/badges/10gen-ops/ksec/status.svg)](https://cloud.drone.io/10gen-ops/ksec)
 
 A command line tool that simplifies the management of Kubernetes Secrets.
+- Easily set and unset k8s Secret keys
+- Handles base64 encoding
+- Supports synchronization of `.env` files to k8s Secrets
 
 ## Installation
 
