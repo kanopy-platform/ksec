@@ -16,9 +16,10 @@ key1=
 key2=value2
 key3
 `)
-	data := map[string][]byte{}
 
-	assert.NoError(t, scanSecretData(reader, data))
+	data, err := readSecretData(reader)
+	assert.NoError(t, err)
+
 	assert.Equal(t, "value", string(data["key"]))
 	assert.Equal(t, "", string(data["key1"]))
 	assert.Equal(t, "value2", string(data["key2"]))

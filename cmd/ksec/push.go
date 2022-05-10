@@ -19,7 +19,6 @@ var pushCmd = &cobra.Command{
 func pushCommand(cmd *cobra.Command, args []string) error {
 	fileArg := args[0]
 	secretName := args[1]
-	data := make(map[string][]byte)
 
 	file, err := os.Open(fileArg)
 	if err != nil {
@@ -27,7 +26,8 @@ func pushCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer file.Close()
 
-	if err := scanSecretData(file, data); err != nil {
+	data, err := readSecretData(file)
+	if err != nil {
 		return err
 	}
 
@@ -38,7 +38,8 @@ func pushCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func scanSecretData(reader io.Reader, data map[string][]byte) error {
+func readSecretData(reader io.Reader) (map[string][]byte, error) {
+	data := map[string][]byte{}
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
@@ -49,5 +50,9 @@ func scanSecretData(reader io.Reader, data map[string][]byte) error {
 		}
 	}
 
-	return scanner.Err()
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
