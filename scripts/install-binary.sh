@@ -6,7 +6,7 @@ if [ -n "${HELM_LINTER_PLUGIN_NO_INSTALL_HOOK}" ]; then
 fi
 
 PROJECT_NAME="ksec"
-PROJECT_GH="10gen-ops/$PROJECT_NAME"
+PROJECT_GH="kanopy-platform/$PROJECT_NAME"
 
 : ${HELM_PLUGIN_PATH:="$(pwd)/${PROJECT_NAME}"}
 

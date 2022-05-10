@@ -1,4 +1,4 @@
-module github.com/10gen-ops/ksec
+module github.com/kanopy-platform/ksec
 
 go 1.17
 
