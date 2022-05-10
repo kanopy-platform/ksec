@@ -1,5 +1,7 @@
 # ksec
 
+**PLEASE NOTE:** FYI, this repo has been archived in favor of https://github.com/kanopy-platform/ksec.
+
 [![Build Status](https://cloud.drone.io/api/badges/10gen-ops/ksec/status.svg)](https://cloud.drone.io/10gen-ops/ksec)
 
 A command line tool that simplifies the management of Kubernetes Secrets.
