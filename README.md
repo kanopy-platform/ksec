@@ -1,6 +1,6 @@
 # ksec
 
-[![Build Status](https://cloud.drone.io/api/badges/10gen-ops/ksec/status.svg)](https://cloud.drone.io/10gen-ops/ksec)
+[![Build Status](https://cloud.drone.io/api/badges/kanopy-platform/ksec/status.svg)](https://cloud.drone.io/kanopy-platform/ksec)
 
 A command line tool that simplifies the management of Kubernetes Secrets.
 - Easily set and unset k8s Secret keys
@@ -9,17 +9,17 @@ A command line tool that simplifies the management of Kubernetes Secrets.
 
 ## Installation
 
-Compiled binaries can be found in the [GitHub releases](https://github.com/10gen-ops/ksec/releases).
+Compiled binaries can be found in the [GitHub releases](https://github.com/kanopy-platform/ksec/releases).
 
 Install compiled binary as a Helm plugin (requires [Helm](https://docs.helm.sh/using_helm/#installing-helm)).
 
-    helm plugin install https://github.com/10gen-ops/ksec
+    helm plugin install https://github.com/kanopy-platform/ksec
 
-Please Note: This may not work on Windows if you have spaces in your `HELM_HOME` path. You can instead download the windows executable from the [latest release](https://github.com/10gen-ops/ksec/releases/latest).
+Please Note: This may not work on Windows if you have spaces in your `HELM_HOME` path. You can instead download the windows executable from the [latest release](https://github.com/kanopy-platform/ksec/releases/latest).
 
 Install from source (requires [golang](https://golang.org/doc/install#install)).
 
-    go get github.com/10gen-ops/ksec/cmd/...
+    go get github.com/kanopy-platform/ksec/cmd/...
 
 ## Usage
 ```

@@ -1,5 +1,6 @@
+---
 name: "ksec"
-version: "0.1.4"
+version: "0.1.5"
 usage: "Manage Kubernetes Secrets through Helm"
 description: "Helm plugin that simplifies the management of Kubernetes Secrets"
 ignoreFlags: false

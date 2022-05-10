@@ -9,8 +9,8 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	"github.com/10gen-ops/ksec/pkg/models"
-	"github.com/10gen-ops/ksec/pkg/version"
+	"github.com/kanopy-platform/ksec/pkg/models"
+	"github.com/kanopy-platform/ksec/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
