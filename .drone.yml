@@ -5,8 +5,6 @@ name: default
 
 steps:
   - name: test
-    image: golangci/golangci-lint:v1.30.0-alpine
+    image: golangci/golangci-lint:v1.42.1
     commands:
-      - apk update
-      - apk add make
       - make test
