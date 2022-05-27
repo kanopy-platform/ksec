@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"io"
 	"os"
 	"strings"
@@ -19,6 +20,7 @@ var pushCmd = &cobra.Command{
 func pushCommand(cmd *cobra.Command, args []string) error {
 	fileArg := args[0]
 	secretName := args[1]
+	ctx := context.Background()
 
 	file, err := os.Open(fileArg)
 	if err != nil {
@@ -31,7 +33,7 @@ func pushCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	_, err = secretsClient.Upsert(secretName, data)
+	_, err = secretsClient.Upsert(ctx, secretName, data)
 	if err != nil {
 		return err
 	}

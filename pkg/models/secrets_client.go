@@ -1,13 +1,14 @@
 package models
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -54,23 +55,23 @@ func NewSecretsClient(namespace string) (*SecretsClient, error) {
 }
 
 // List all Secrets
-func (s *SecretsClient) List() (*v1.SecretList, error) {
-	return s.secretInterface.List(metav1.ListOptions{})
+func (s *SecretsClient) List(ctx context.Context) (*v1.SecretList, error) {
+	return s.secretInterface.List(ctx, metav1.ListOptions{})
 }
 
 // Create a new Secret
-func (s *SecretsClient) Create(name string) (*v1.Secret, error) {
+func (s *SecretsClient) Create(ctx context.Context, name string) (*v1.Secret, error) {
 	secret := v1.Secret{
 		Type: v1.SecretTypeOpaque,
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
 	}
-	return s.secretInterface.Create(&secret)
+	return s.secretInterface.Create(ctx, &secret, metav1.CreateOptions{})
 }
 
 // CreateWithData creates a new Secret and passed in Data keys
-func (s *SecretsClient) CreateWithData(name string, data map[string][]byte) (*v1.Secret, error) {
+func (s *SecretsClient) CreateWithData(ctx context.Context, name string, data map[string][]byte) (*v1.Secret, error) {
 
 	annotation := NewKeyAnnotation(s.AuthInfo)
 	annotations := make(map[string]string)
@@ -91,22 +92,22 @@ func (s *SecretsClient) CreateWithData(name string, data map[string][]byte) (*v1
 		},
 		Data: data,
 	}
-	return s.secretInterface.Create(&secret)
+	return s.secretInterface.Create(ctx, &secret, metav1.CreateOptions{})
 }
 
 // Delete a secret
-func (s *SecretsClient) Delete(name string) error {
-	return s.secretInterface.Delete(name, &metav1.DeleteOptions{})
+func (s *SecretsClient) Delete(ctx context.Context, name string) error {
+	return s.secretInterface.Delete(ctx, name, metav1.DeleteOptions{})
 }
 
 // Get Secret
-func (s *SecretsClient) Get(name string) (*v1.Secret, error) {
-	return s.secretInterface.Get(name, metav1.GetOptions{})
+func (s *SecretsClient) Get(ctx context.Context, name string) (*v1.Secret, error) {
+	return s.secretInterface.Get(ctx, name, metav1.GetOptions{})
 }
 
 // GetKey retrieves an individual keys value from a secret
-func (s *SecretsClient) GetKey(name, key string) (string, error) {
-	secret, err := s.Get(name)
+func (s *SecretsClient) GetKey(ctx context.Context, name, key string) (string, error) {
+	secret, err := s.Get(ctx, name)
 	if err != nil {
 		return "", err
 	}
@@ -120,7 +121,7 @@ func (s *SecretsClient) GetKey(name, key string) (string, error) {
 }
 
 // Update Secret keys
-func (s *SecretsClient) Update(secret *v1.Secret, data map[string][]byte) (*v1.Secret, error) {
+func (s *SecretsClient) Update(ctx context.Context, secret *v1.Secret, data map[string][]byte) (*v1.Secret, error) {
 	if secret.Data == nil {
 		secret.Data = make(map[string][]byte)
 	}
@@ -138,14 +139,14 @@ func (s *SecretsClient) Update(secret *v1.Secret, data map[string][]byte) (*v1.S
 		secret.Annotations[fmt.Sprintf("%s/%s", annotationPrefix, key)] = string(jsonBytes)
 	}
 
-	return s.secretInterface.Update(secret)
+	return s.secretInterface.Update(ctx, secret, metav1.UpdateOptions{})
 }
 
 // Upsert creates a Secret if needed and updates Secret keys
-func (s *SecretsClient) Upsert(name string, data map[string][]byte) (*v1.Secret, error) {
-	secret, err := s.Get(name)
+func (s *SecretsClient) Upsert(ctx context.Context, name string, data map[string][]byte) (*v1.Secret, error) {
+	secret, err := s.Get(ctx, name)
 	if err != nil {
-		return s.CreateWithData(name, data)
+		return s.CreateWithData(ctx, name, data)
 	}
-	return s.Update(secret, data)
+	return s.Update(ctx, secret, data)
 }

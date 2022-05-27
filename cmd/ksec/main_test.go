@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -44,13 +45,15 @@ func cmdExec(args []string) error {
 
 // tests
 func TestCreateSecret(t *testing.T) {
+	ctx := context.Background()
+
 	err := cmdExec([]string{"create", "test"})
 	testErr(err, t)
 
 	err = cmdExec([]string{"set", "test", "key=value"})
 	testErr(err, t)
 
-	secret, err := secretsClient.Get("test")
+	secret, err := secretsClient.Get(ctx, "test")
 	testErr(err, t)
 
 	val, ok := secret.Data["key"]
@@ -62,10 +65,11 @@ func TestCreateSecret(t *testing.T) {
 }
 
 func TestUnsetSecretKey(t *testing.T) {
+	ctx := context.Background()
 	err := cmdExec([]string{"unset", "test", "key"})
 	testErr(err, t)
 
-	secret, err := secretsClient.Get("test")
+	secret, err := secretsClient.Get(ctx, "test")
 	testErr(err, t)
 
 	if _, ok := secret.Data["key"]; ok {
@@ -84,6 +88,7 @@ func TestDeleteSecret(t *testing.T) {
 }
 
 func TestPushSecret(t *testing.T) {
+	ctx := context.Background()
 	content := []byte("ENV_VAR=secret")
 	tempfile, err := ioutil.TempFile("", "ksec")
 	testErr(err, t)
@@ -95,7 +100,7 @@ func TestPushSecret(t *testing.T) {
 	err = cmdExec([]string{"push", tempfile.Name(), "pushtest"})
 	testErr(err, t)
 
-	secret, err := secretsClient.Get("pushtest")
+	secret, err := secretsClient.Get(ctx, "pushtest")
 	testErr(err, t)
 
 	val, ok := secret.Data["ENV_VAR"]

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -16,8 +17,9 @@ var unsetCmd = &cobra.Command{
 func unsetCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	keys := args[1:]
+	ctx := context.Background()
 
-	secret, err := secretsClient.Get(name)
+	secret, err := secretsClient.Get(ctx, name)
 	if err != nil {
 		return err
 	}
@@ -28,7 +30,7 @@ func unsetCommand(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Removed \"%s\" from secret \"%s\"\n", key, name)
 	}
 
-	_, err = secretsClient.Update(secret, secret.Data)
+	_, err = secretsClient.Update(ctx, secret, secret.Data)
 	if err != nil {
 		return err
 	}
