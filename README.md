@@ -8,7 +8,7 @@ A command line tool that simplifies the management of Kubernetes Secrets.
 ## Installation
 
 Compiled binaries can be found in the [GitHub releases](https://github.com/kanopy-platform/ksec/releases).
-
+awefawefw
 Install compiled binary as a Helm plugin (requires [Helm](https://docs.helm.sh/using_helm/#installing-helm)).
 
     helm plugin install https://github.com/kanopy-platform/ksec
