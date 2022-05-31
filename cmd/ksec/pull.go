@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -16,8 +17,9 @@ var pullCmd = &cobra.Command{
 
 func pullCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
+	ctx := context.Background()
 
-	secret, err := secretsClient.Get(name)
+	secret, err := secretsClient.Get(ctx, name)
 	if err != nil {
 		return err
 	}

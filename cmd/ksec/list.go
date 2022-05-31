@@ -1,10 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 // listCmd represents the list command
@@ -17,7 +18,9 @@ var listCmd = &cobra.Command{
 }
 
 func listCommand(cmd *cobra.Command, args []string) error {
-	secrets, err := secretsClient.List()
+	ctx := context.Background()
+
+	secrets, err := secretsClient.List(ctx)
 	if err != nil {
 		return err
 	}

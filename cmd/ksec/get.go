@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -17,9 +18,10 @@ var getCmd = &cobra.Command{
 
 func getCommand(cmd *cobra.Command, args []string) error {
 	secretName := args[0]
+	ctx := context.Background()
 
 	if len(args) > 1 {
-		value, err := secretsClient.GetKey(secretName, args[1])
+		value, err := secretsClient.GetKey(ctx, secretName, args[1])
 		if err != nil {
 			return err
 		}
@@ -28,7 +30,7 @@ func getCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	secret, err := secretsClient.Get(secretName)
+	secret, err := secretsClient.Get(ctx, secretName)
 	if err != nil {
 		return err
 	}

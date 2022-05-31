@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -18,6 +19,7 @@ func setCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	dataArgs := args[1:]
 	data := make(map[string][]byte)
+	ctx := context.Background()
 
 	for _, item := range dataArgs {
 		split := strings.SplitN(item, "=", 2)
@@ -27,7 +29,7 @@ func setCommand(cmd *cobra.Command, args []string) error {
 		data[split[0]] = []byte(split[1])
 	}
 
-	_, err := secretsClient.Upsert(name, data)
+	_, err := secretsClient.Upsert(ctx, name, data)
 	if err != nil {
 		return err
 	}

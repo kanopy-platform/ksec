@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -15,13 +16,15 @@ var deleteCmd = &cobra.Command{
 }
 
 func deleteCommand(cmd *cobra.Command, args []string) error {
+	ctx := context.Background()
+
 	skipconfirm, err := cmd.Flags().GetBool("yes")
 	if err != nil {
 		return err
 	}
 
 	for _, name := range args {
-		if _, err := secretsClient.Get(name); err != nil {
+		if _, err := secretsClient.Get(ctx, name); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
@@ -32,7 +35,7 @@ func deleteCommand(cmd *cobra.Command, args []string) error {
 			continue
 		}
 
-		if err := secretsClient.Delete(name); err != nil {
+		if err := secretsClient.Delete(ctx, name); err != nil {
 			return err
 		}
 		fmt.Printf("Deleted secret \"%s\"\n", name)
