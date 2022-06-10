@@ -4,7 +4,23 @@ type: kubernetes
 name: default
 
 steps:
-  - name: test
-    image: golangci/golangci-lint:v1.42.1
+  - name: write
+    image: alpine
+    volumes:
+      - name: cache
+        path: /mnt/cache
+    environment:
+      SUPERSECRET:
+        from_secret: supersecret
     commands:
-      - make test
+      - echo $SUPERSECRET > /mnt/cache/secret
+  - name: read
+    image: alpine
+    volumes:
+      - name: cache
+        path: /mnt/cache
+    commands:
+      - cat /mnt/cache/secret
+volumes:
+  - name: cache
+    temp: {}
