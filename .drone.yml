@@ -5,6 +5,6 @@ name: default
 
 steps:
   - name: test
-    image: golangci/golangci-lint:v1.42.1
+    image: golangci/golangci-lint:v1.53.2
     commands:
       - make test
