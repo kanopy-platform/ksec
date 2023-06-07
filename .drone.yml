@@ -8,26 +8,3 @@ steps:
     image: golangci/golangci-lint:v1.53.2
     commands:
       - make test
-
-  - name: dist
-    image: golang:1.20
-    environment:
-      VERSION: ${DRONE_TAG}
-      GIT_COMMIT: ${DRONE_COMMIT_SHA:0:7}
-    commands:
-      - make dist
-    when:
-      event: tag
-    depends_on:
-      - test
-
-  - name: publish
-    image: plugins/github-release
-    settings:
-      api_key:
-        from_secret: github_api_key
-      files: dist/*
-    when:
-      event: tag
-    depends_on:
-      - dist
