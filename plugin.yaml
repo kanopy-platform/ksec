@@ -1,0 +1,10 @@
+---
+name: "ksec"
+version: "0.1.7"
+usage: "Manage Kubernetes Secrets through Helm"
+description: "Helm plugin that simplifies the management of Kubernetes Secrets"
+ignoreFlags: false
+useTunnel: false
+command: "$HELM_PLUGIN_DIR/ksec"
+hooks:
+  install: "cd $HELM_PLUGIN_DIR && scripts/install-binary.sh"
