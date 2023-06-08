@@ -51,4 +51,4 @@ Use "ksec [command] --help" for more information about a command.
 
 Run `make` to run all tests and create a new binary in `${GOPATH}/bin/`
 
-Run `make dist` to cross compile binaries into a `./_dist/` directory. These binaries can then be uploaded to a new GitHub release.
+Run `VERSION=<version_number> make dist` to cross compile binaries into a `./dist/` directory. These binaries can then be uploaded to a new GitHub release.

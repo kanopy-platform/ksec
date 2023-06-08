@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/kanopy-platform/ksec/pkg/models"
-	"github.com/kanopy-platform/ksec/pkg/version"
 	"github.com/spf13/cobra"
 )
 
@@ -18,9 +17,8 @@ var rootCmd *cobra.Command
 
 func TestMain(m *testing.M) {
 	rootCmd = &cobra.Command{
-		Use:     "ksec",
-		Short:   "A tool for managing Kubernetes Secret data",
-		Version: version.Version,
+		Use:   "ksec",
+		Short: "A tool for managing Kubernetes Secret data",
 	}
 	initRootCmd(rootCmd)
 	secretsClient = models.MockNewSecretsClient()
@@ -28,7 +26,7 @@ func TestMain(m *testing.M) {
 
 }
 
-//helpers
+// helpers
 func testErr(err error, t *testing.T) {
 	if err != nil {
 		t.Fatal(err)

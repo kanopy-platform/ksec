@@ -1,3 +1,5 @@
-/_dist
+/bin
+/dist
 /ksec
 /ksec.exe
+plugin.yaml
