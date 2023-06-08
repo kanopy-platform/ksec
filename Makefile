@@ -50,4 +50,4 @@ dist-windows:
 
 .PHONY: clean
 clean:
-	rm -rf ./bin ./dist plugin.yaml
+	rm -rf ./bin ./dist
