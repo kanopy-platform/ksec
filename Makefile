@@ -26,10 +26,10 @@ dist-setup:
 	./scripts/plugin.yaml.sh ${VERSION}
 
 .PHONY: dist-build
-dist-build: BIN_NAME=${CMD_NAME}-${GOOS}-${GOARCH}-${VERSION}${FILE_EXT}
+dist-build: BIN_NAME=${CMD_NAME}-${GOOS}-${GOARCH}-${VERSION}
 dist-build:
-	go build -ldflags=$(LDFLAGS) -o ./bin/$(BIN_NAME) ./cmd/$(CMD_NAME)/
-	tar -zcvf dist/$(BIN_NAME).tgz ./bin/$(BIN_NAME) README.md LICENSE plugin.yaml
+	go build -ldflags=$(LDFLAGS) -o ./bin/$(BIN_NAME)${FILE_EXT} ./cmd/$(CMD_NAME)/
+	tar -zcvf dist/$(BIN_NAME).tgz ./bin/$(BIN_NAME)${FILE_EXT} README.md LICENSE plugin.yaml
 
 .PHONY: dist-amd-arm
 dist-amd-arm:
