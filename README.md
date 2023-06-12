@@ -13,11 +13,28 @@ Install compiled binary as a Helm plugin (requires [Helm](https://docs.helm.sh/u
 
     helm plugin install https://github.com/kanopy-platform/ksec
 
-Please Note: This may not work on Windows if you have spaces in your `HELM_HOME` path. You can instead download the windows executable from the [latest release](https://github.com/kanopy-platform/ksec/releases/latest).
-
 Install from source (requires [golang](https://golang.org/doc/install#install)).
 
     go get github.com/kanopy-platform/ksec/cmd/...
+
+### Trobleshooting
+
+#### Windows: Spaces in `HELM_HOME`
+
+`helm plugin install` may not work on Windows if you have spaces in your `HELM_HOME` path. You can instead download the windows executable from the [latest release](https://github.com/kanopy-platform/ksec/releases/latest).
+
+#### Helm Install Errors
+
+You may need to remove a plugin and clear your plugin cache if you have errors installing a plugin.
+
+macOS
+```
+# rm cache
+rm -rf ~/Library/Caches/helm/plugins/https-github.com-kanopy-platform-ksec*
+
+# rm plugin
+rm -rf ~/Library/helm/plugins/ksec/
+```
 
 ## Usage
 ```
