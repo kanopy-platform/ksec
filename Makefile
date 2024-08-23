@@ -17,6 +17,11 @@ test:
 build:
 	go install ./cmd/ksec/
 
+.PHONY: install-plugin-locally
+install-plugin-locally: build
+	helm plugin remove $(CMD_NAME) || true
+	HELM_PLUGIN_BUILD_SOURCE=1 helm plugin install $(shell pwd)
+
 .PHONY: dist
 dist: dist-setup dist-linux dist-darwin dist-windows ## Cross compile binaries into ./dist/
 

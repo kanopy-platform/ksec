@@ -6,6 +6,14 @@ if [ -n "${HELM_LINTER_PLUGIN_NO_INSTALL_HOOK}" ]; then
 fi
 
 PROJECT_NAME="ksec"
+
+if [ -n "${HELM_PLUGIN_BUILD_SOURCE}" ]; then
+    echo "Building and installing from local source."
+    cd $HELM_PLUGIN_DIR
+    go build -o "$HELM_PLUGIN_DIR/$PROJECT_NAME" ./cmd/$PROJECT_NAME/
+    exit 0
+fi
+
 PROJECT_GH="kanopy-platform/$PROJECT_NAME"
 
 : ${HELM_PLUGIN_PATH:="$(pwd)/${PROJECT_NAME}"}
