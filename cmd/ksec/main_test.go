@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -83,7 +82,7 @@ func TestPushSecret(t *testing.T) {
 	ctx := context.Background()
 	content := []byte("ENV_VAR=secret")
 
-	tempfile, err := ioutil.TempFile("", "ksec")
+	tempfile, err := os.CreateTemp("", "ksec")
 	assert.NoError(t, err, "Creating temp file should not return an error")
 	defer os.Remove(tempfile.Name())
 
@@ -106,7 +105,7 @@ func TestPushSecret(t *testing.T) {
 }
 
 func TestPullSecret(t *testing.T) {
-	tempfile, err := ioutil.TempFile("", "ksec")
+	tempfile, err := os.CreateTemp("", "ksec")
 	assert.NoError(t, err, "Creating temp file should not return an error")
 	defer os.Remove(tempfile.Name())
 
