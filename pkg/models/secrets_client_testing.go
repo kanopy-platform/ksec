@@ -4,11 +4,11 @@ import (
 	testclient "k8s.io/client-go/kubernetes/fake"
 )
 
-// mock client
-func MockNewSecretsClient() *SecretsClient {
+// MockNewSecretsClient creates a new SecretsClient with a mock Kubernetes client
+func MockNewSecretsClient(namespace string) *SecretsClient {
 	return &SecretsClient{
-		secretInterface: testclient.NewSimpleClientset().CoreV1().Secrets("default"),
-		Namespace:       "default",
+		secretInterface: testclient.NewSimpleClientset().CoreV1().Secrets(namespace),
+		Namespace:       namespace,
 		AuthInfo:        "testuser",
 	}
 }
