@@ -52,13 +52,7 @@ func TestCreateSecret(t *testing.T) {
 func TestUnsetSecretKey(t *testing.T) {
 	ctx := context.Background()
 
-	// Create/Set the secret
-	err := cmdExec([]string{"create", "test"})
-	assert.NoError(t, err, "Creating secret should not return an error")
-	err = cmdExec([]string{"set", "test", "key=value"})
-	assert.NoError(t, err, "Setting secret key should not return an error")
-
-	err = cmdExec([]string{"unset", "test", "key"})
+	err := cmdExec([]string{"unset", "test", "key"})
 	assert.NoError(t, err, "Unsetting secret key should not return an error")
 
 	secret, err := secretsClient.Get(ctx, "test")
