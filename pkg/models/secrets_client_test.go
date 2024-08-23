@@ -10,6 +10,7 @@ import (
 
 var secretsClient *SecretsClient
 var expectedSecretName = "test-secret"
+var defaultNamespace = "default"
 
 // setupTestClient initializes a new secretsClient before each test
 func setupTestClient(namespace string) {
@@ -17,12 +18,12 @@ func setupTestClient(namespace string) {
 }
 
 func TestNewSecretsClient(t *testing.T) {
-	setupTestClient("default")
-	assert.Equal(t, "default", secretsClient.Namespace, "Namespace should be 'default'")
+	setupTestClient(defaultNamespace)
+	assert.Equal(t, "default", secretsClient.Namespace, "Namespace should be %s", defaultNamespace)
 }
 
 func TestCreate(t *testing.T) {
-	setupTestClient("default")
+	setupTestClient(defaultNamespace)
 	ctx := context.Background()
 
 	secret, err := secretsClient.Create(ctx, expectedSecretName)
@@ -33,7 +34,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	setupTestClient("default")
+	setupTestClient(defaultNamespace)
 	ctx := context.Background()
 
 	_, err := secretsClient.Create(ctx, expectedSecretName)
@@ -46,7 +47,7 @@ func TestList(t *testing.T) {
 }
 
 func TestCreateWithData(t *testing.T) {
-	setupTestClient("default")
+	setupTestClient(defaultNamespace)
 	ctx := context.Background()
 
 	dataArgs := []string{
@@ -72,7 +73,7 @@ func TestCreateWithData(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	setupTestClient("default")
+	setupTestClient(defaultNamespace)
 	ctx := context.Background()
 
 	_, err := secretsClient.CreateWithData(ctx, expectedSecretName, map[string][]byte{
@@ -86,7 +87,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetKey(t *testing.T) {
-	setupTestClient("default")
+	setupTestClient(defaultNamespace)
 	ctx := context.Background()
 
 	_, err := secretsClient.CreateWithData(ctx, expectedSecretName, map[string][]byte{
@@ -104,7 +105,7 @@ func TestGetKey(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	setupTestClient("default")
+	setupTestClient(defaultNamespace)
 	ctx := context.Background()
 
 	secret, err := secretsClient.CreateWithData(ctx, expectedSecretName, map[string][]byte{
@@ -122,7 +123,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestUpsert(t *testing.T) {
-	setupTestClient("default")
+	setupTestClient(defaultNamespace)
 	ctx := context.Background()
 
 	data := map[string][]byte{
