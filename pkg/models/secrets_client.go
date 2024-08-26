@@ -40,6 +40,13 @@ func NewSecretsClient(namespace string) (*SecretsClient, error) {
 		return nil, err
 	}
 
+	if namespace == "" {
+		namespace, _, err = kubeConfig.Namespace()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &SecretsClient{
 		secretInterface: clientSet.CoreV1().Secrets(namespace),
 		Namespace:       namespace,
