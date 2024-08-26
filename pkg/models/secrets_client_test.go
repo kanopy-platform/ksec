@@ -11,15 +11,27 @@ import (
 var secretsClient *SecretsClient
 var expectedSecretName = "test-secret"
 var defaultNamespace = "default"
+var err error
 
 // setupTestClient initializes a new secretsClient before each test
 func setupTestClient(namespace string) {
-	secretsClient = MockNewSecretsClient(namespace)
+	mockConfig := MockClientConfig()
+	secretsClient, err = MockNewSecretsClient(mockConfig, namespace)
 }
 
 func TestNewSecretsClient(t *testing.T) {
 	setupTestClient(defaultNamespace)
-	assert.Equal(t, "default", secretsClient.Namespace, "Namespace should be %s", defaultNamespace)
+
+	assert.NoError(t, err)
+	assert.Equal(t, defaultNamespace, secretsClient.Namespace)
+	assert.Equal(t, "testuser", secretsClient.AuthInfo)
+	assert.NotNil(t, secretsClient.secretInterface)
+}
+
+func TestNewSecretsClientUndefinedNamespace(t *testing.T) {
+	// undefined namespace, expected to fail
+	setupTestClient("")
+	assert.Error(t, err)
 }
 
 func TestCreate(t *testing.T) {
