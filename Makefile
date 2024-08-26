@@ -17,8 +17,8 @@ test:
 build:
 	go install ./cmd/ksec/
 
-.PHONY: install-plugin-locally
-install-plugin-locally: build
+.PHONY: install-plugin-local
+install-plugin-local: build
 	helm plugin remove $(CMD_NAME) || true
 	HELM_PLUGIN_BUILD_SOURCE=1 helm plugin install $(shell pwd)
 
