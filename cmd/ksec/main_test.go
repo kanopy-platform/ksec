@@ -21,7 +21,8 @@ func TestMain(m *testing.M) {
 		Short: "A tool for managing Kubernetes Secret data",
 	}
 	initRootCmd(rootCmd)
-	secretsClient = models.MockNewSecretsClient("default")
+	mockConfig := models.MockClientConfig()
+	secretsClient, _ = models.MockNewSecretsClient(mockConfig, "default")
 	os.Exit(m.Run())
 }
 
