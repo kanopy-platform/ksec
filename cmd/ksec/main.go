@@ -59,7 +59,8 @@ func NewRootCmd() *cobra.Command {
 			var err error
 			namespace := viper.GetString("namespace")
 
-			if namespace == "" {
+			// sets namespace when used as a helm plugin since helm hijacks the "--namespace" flag.
+			if namespace == "" && os.Getenv("HELM_NAMESPACE") != "" {
 				namespace = os.Getenv("HELM_NAMESPACE")
 			}
 
