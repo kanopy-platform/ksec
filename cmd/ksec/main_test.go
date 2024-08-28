@@ -3,13 +3,13 @@ package main
 import (
 	"bufio"
 	"context"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/kanopy-platform/ksec/pkg/models"
 	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 // mock rootCmd
@@ -21,24 +21,14 @@ func TestMain(m *testing.M) {
 		Short: "A tool for managing Kubernetes Secret data",
 	}
 	initRootCmd(rootCmd)
-	secretsClient = models.MockNewSecretsClient()
+	mockConfig := models.MockClientConfig()
+	secretsClient, _ = models.MockNewSecretsClient(mockConfig, "default")
 	os.Exit(m.Run())
-
-}
-
-// helpers
-func testErr(err error, t *testing.T) {
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func cmdExec(args []string) error {
 	rootCmd.SetArgs(args)
-	if err := rootCmd.Execute(); err != nil {
-		return err
-	}
-	return nil
+	return rootCmd.Execute()
 }
 
 // tests
@@ -46,88 +36,87 @@ func TestCreateSecret(t *testing.T) {
 	ctx := context.Background()
 
 	err := cmdExec([]string{"create", "test"})
-	testErr(err, t)
+	assert.NoError(t, err, "Creating secret should not return an error")
 
 	err = cmdExec([]string{"set", "test", "key=value"})
-	testErr(err, t)
+	assert.NoError(t, err, "Setting secret key should not return an error")
 
 	secret, err := secretsClient.Get(ctx, "test")
-	testErr(err, t)
+	assert.NoError(t, err, "Getting secret should not return an error")
+	assert.NotNil(t, secret, "Secret should not be nil")
 
 	val, ok := secret.Data["key"]
-	if !ok {
-		t.Fatal("Key does not exist")
-	} else if string(val) != "value" {
-		t.Fatal("Key has incorrect value")
-	}
+	assert.True(t, ok, "Key should exist in secret data")
+	assert.Equal(t, "value", string(val), "Key should have the correct value")
 }
 
 func TestUnsetSecretKey(t *testing.T) {
 	ctx := context.Background()
+
 	err := cmdExec([]string{"unset", "test", "key"})
-	testErr(err, t)
+	assert.NoError(t, err, "Unsetting secret key should not return an error")
 
 	secret, err := secretsClient.Get(ctx, "test")
-	testErr(err, t)
+	assert.NoError(t, err, "Getting secret should not return an error")
+	assert.NotNil(t, secret, "Secret should not be nil")
 
-	if _, ok := secret.Data["key"]; ok {
-		t.Fatal("Key should not exist")
-	}
+	_, ok := secret.Data["key"]
+	assert.False(t, ok, "Key should not exist in secret data")
 }
 
 func TestDeleteSecret(t *testing.T) {
 	err := cmdExec([]string{"delete", "test", "--yes"})
-	testErr(err, t)
+	assert.NoError(t, err, "Deleting secret should not return an error")
 
 	err = cmdExec([]string{"get", "test"})
-	if !strings.HasSuffix(err.Error(), "not found") {
-		t.Fatal("Secret still exists")
-	}
+	assert.Error(t, err, "Getting deleted secret should return an error")
+	assert.True(t, strings.HasSuffix(err.Error(), "not found"), "Error should indicate that the secret was not found")
 }
 
 func TestPushSecret(t *testing.T) {
 	ctx := context.Background()
 	content := []byte("ENV_VAR=secret")
-	tempfile, err := ioutil.TempFile("", "ksec")
-	testErr(err, t)
+
+	tempfile, err := os.CreateTemp("", "ksec")
+	assert.NoError(t, err, "Creating temp file should not return an error")
 	defer os.Remove(tempfile.Name())
 
 	_, err = tempfile.Write(content)
-	testErr(err, t)
+	assert.NoError(t, err, "Writing to temp file should not return an error")
 
 	err = cmdExec([]string{"push", tempfile.Name(), "pushtest"})
-	testErr(err, t)
+	assert.NoError(t, err, "Pushing secret should not return an error")
 
 	secret, err := secretsClient.Get(ctx, "pushtest")
-	testErr(err, t)
+	assert.NoError(t, err, "Getting pushed secret should not return an error")
+	assert.NotNil(t, secret, "Pushed secret should not be nil")
 
 	val, ok := secret.Data["ENV_VAR"]
-	if !ok {
-		t.Fatal("Key does not exist")
-	} else if string(val) != "secret" {
-		t.Fatal("Key has incorrect value")
-	}
+	assert.True(t, ok, "ENV_VAR key should exist in pushed secret data")
+	assert.Equal(t, "secret", string(val), "ENV_VAR key should have the correct value")
 
 	err = tempfile.Close()
-	testErr(err, t)
+	assert.NoError(t, err, "Closing temp file should not return an error")
 }
 
 func TestPullSecret(t *testing.T) {
-	tempfile, err := ioutil.TempFile("", "ksec")
-	testErr(err, t)
+	tempfile, err := os.CreateTemp("", "ksec")
+	assert.NoError(t, err, "Creating temp file should not return an error")
 	defer os.Remove(tempfile.Name())
 
 	err = cmdExec([]string{"set", "pulltest", "ENV_VAR=secret"})
-	testErr(err, t)
+	assert.NoError(t, err, "Setting secret should not return an error")
 
 	err = cmdExec([]string{"pull", "pulltest", tempfile.Name()})
-	testErr(err, t)
+	assert.NoError(t, err, "Pulling secret should not return an error")
 
-	reader := bufio.NewReader(tempfile)
+	file, err := os.Open(tempfile.Name())
+	assert.NoError(t, err, "Opening temp file should not return an error")
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
 	line, _, err := reader.ReadLine()
-	testErr(err, t)
+	assert.NoError(t, err, "Reading line from temp file should not return an error")
 
-	if string(line) != "ENV_VAR=secret" {
-		t.Fatal("File does not contain pulled contents")
-	}
+	assert.Equal(t, "ENV_VAR=secret", string(line), "File should contain the pulled secret contents")
 }

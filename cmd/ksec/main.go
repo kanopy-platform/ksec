@@ -57,7 +57,14 @@ func NewRootCmd() *cobra.Command {
 		Version: version.Get().Version,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			var err error
-			secretsClient, err = models.NewSecretsClient(viper.GetString("namespace"))
+			namespace := viper.GetString("namespace")
+
+			// sets namespace when used as a helm plugin since helm hijacks the "--namespace" flag.
+			if namespace == "" && os.Getenv("HELM_NAMESPACE") != "" {
+				namespace = os.Getenv("HELM_NAMESPACE")
+			}
+
+			secretsClient, err = models.NewSecretsClient(namespace)
 			if err != nil {
 				log.Fatal(err.Error())
 			}
